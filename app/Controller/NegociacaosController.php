@@ -1,0 +1,321 @@
+<?php
+
+App::uses('AppController', 'Controller');
+
+App::import('Controller', 'Users');
+
+App::uses('GoogleCharts', 'GoogleCharts.Lib');
+
+/**
+ * Negociacaos Controller
+ */
+class NegociacaosController extends AppController {
+
+    function beforeFilter() {
+
+    }
+
+    /**
+     * index method
+     */
+    public function index() {
+
+        $dadosUser = $this->Session->read();
+
+        $conditions = array();
+        $filter_status = '';
+
+        $this->set('adminholding', $dadosUser['Auth']['User']['adminholding']);
+
+        $status = array('E' => 'EM ANDAMENTO', 'A' => 'ACEITA', 'F' => 'FINALIZADO', 'C' => 'CANCELADO');
+
+        $this->Negociacao->recursive = 1;
+
+        $this->Filter->addFilters(
+                array(
+                    'filter1' => array(
+                        'Negociacao.referencia' => array(
+                            'operator' => 'ILIKE',
+                            'value' => array(
+                                'before' => '%',
+                                'after' => '%'
+                            )
+                        )
+                    ),
+                    'filter2' => array(
+                        'Negociacao.cliente_vendedor' => array(
+                            'operator' => 'ILIKE',
+                            'value' => array(
+                                'before' => '%',
+                                'after' => '%'
+                            )
+                        )
+                    ),
+                    'filter3' => array(
+                        'Negociacao.cliente_comprador' => array(
+                            'operator' => 'ILIKE',
+                            'value' => array(
+                                'before' => '%',
+                                'after' => '%'
+                            )
+                        )
+                    ),
+                    'filter4' => array(
+                        'Negociacao.dt_ultima_etapa' => array(
+                            'operator' => 'BETWEEN',
+                            'between' => array(
+                                'text' => __(' e ', true),
+                                'date' => true
+                            )
+                        )
+                    ),
+                    'filter5' => array(
+                        'Negociacao.status' => array(
+                            'select' => $status
+                        ),
+                    ),
+                )
+        );
+
+        foreach ($this->Filter->getConditions() as $key => $item) :
+            if ($key == 'Negociacao.status =') {
+                $filter_status = 1;
+            }
+        endforeach;
+
+        if (empty($filter_status)) {
+            $conditions[] = 'Negociacao.status NOT IN (' . "'F', 'C'" . ')';
+        }
+
+        $this->Filter->setPaginate('conditions', array($this->Filter->getConditions(), $conditions));
+
+        $this->set('negociacaos', $this->paginate());
+    }
+
+    /**
+     * view method
+     */
+    public function view($id = null) {
+
+        $this->Negociacao->id = $id;
+        if (!$this->Negociacao->exists()) {
+            $this->Session->setFlash('Registro não encontrado.', 'default', array('class' => 'mensagem_erro'));
+            $this->redirect(array('action' => 'index'));
+        }
+
+        $this->Negociacao->recursive = 1;
+
+        $negociacao = $this->Negociacao->read(null, $id);
+
+        $this->set('negociacao', $negociacao);
+    }
+
+    /**
+     * add method
+     */
+    public function add() {
+
+        $dadosUser = $this->Session->read();
+
+        $this->loadModel('Corretor');
+
+        $corretors = $this->Corretor->find('list', array(
+            'fields' => array('id', 'nome'),
+            'conditions' => array('gerencia' => 'N'),
+            'order' => array('nome' => 'asc')
+        ));
+        $this->set('corretors', $corretors);
+
+        $status = array('E' => 'EM ANDAMENTO');
+        $this->set('status', $status);
+
+        if ($this->request->is('post')) {
+
+            $this->request->data['Negociacao']['user_id'] = $dadosUser['Auth']['User']['id'];
+            $this->request->data['Negociacao']['valor_imovel'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['valor_imovel']));
+            $this->request->data['Negociacao']['valor_proposta'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['valor_proposta']));
+            $this->request->data['Negociacao']['created'] = date('Y-m-d H:i:s');
+            $this->request->data['Negociacao']['modified'] = date('Y-m-d H:i:s');
+            $this->request->data['Negociacao']['status'] = 'E';
+
+            try {
+
+                $this->Negociacao->begin();
+
+                $this->Negociacao->create();
+
+                if ($this->Negociacao->save($this->request->data)) {
+                    $negociacao_id = $this->Negociacao->getLastInsertId();
+
+                    $this->Negociacao->id = $negociacao_id;
+                    $this->Negociacao->saveField('dt_ultima_etapa', date('Y-m-d'));
+
+                    foreach ($this->request->data['Negociacao']['corretor'] as $key => $item) :
+                        $this->Negociacao->query('insert into public.negociacaocorretors(negociacao_id, corretor_id)'
+                                . 'values(' . $negociacao_id . ',' . $item . ')');
+                    endforeach;
+
+                    $this->Negociacao->query('insert into public.negociacaohistoricos(negociacao_id, obs, created, user_id)'
+                            . 'values(' . $negociacao_id . ',' . "'SEM PRÓXIMA ACAO'" . ',' . "'" . date('Y-m-d') . "'" . ',' . $dadosUser['Auth']['User']['id'] . ')');
+
+                    $this->Negociacao->query('insert into public.negociacaostats(negociacao_id, status, obs, created, user_id)'
+                            . 'values(' . $negociacao_id . ',' . "'E'" . ',' . "'" . $this->request->data['Negociacaostat']['obs'] . "'" . ',' . "'" . date('Y-m-d') . "'" . ',' . $dadosUser['Auth']['User']['id'] . ')');
+
+                    $this->Negociacao->commit();
+
+                    $this->Session->setFlash('Registro adicionado com sucesso!', 'default', array('class' => 'mensagem_sucesso'));
+                    $this->redirect(array('action' => 'index'));
+                } else {
+                    $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
+                }
+            } catch (Exception $id) {
+                $this->Negociacao->rollback();
+                $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
+            }
+        }
+    }
+
+    /**
+     * edit method
+     */
+    public function edit($id = null) {
+
+        $dadosUser = $this->Session->read();
+
+        $this->loadModel('Corretor');
+
+        $corretors = $this->Corretor->find('list', array(
+            'fields' => array('id', 'nome'),
+            'conditions' => array('gerencia' => 'N'),
+            'order' => array('nome' => 'asc')
+        ));
+        $this->set(compact('corretors'));
+
+        $this->Negociacao->id = $id;
+        if (!$this->Negociacao->exists($id)) {
+            $this->Session->setFlash('Registro não encontrado.', 'default', array('class' => 'mensagem_erro'));
+            $this->redirect(array('action' => 'index'));
+        }
+
+        $negociacao = $this->Negociacao->read(null, $id);
+
+        if ($this->request->is('post') || $this->request->is('put')) {
+
+            $this->request->data['Negociacao']['user_alt_id'] = $dadosUser['Auth']['User']['id'];
+            $this->request->data['Negociacao']['modified'] = date('Y-m-d H:i:s');
+            $this->request->data['Negociacao']['valor_imovel'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['valor_imovel']));
+            $this->request->data['Negociacao']['valor_proposta'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['valor_proposta']));
+
+            if ($this->Negociacao->save($this->request->data)) {
+                $this->Session->setFlash('Registro alterado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
+                $this->redirect(array('action' => 'index'));
+            } else {
+                $this->Session->setFlash('Registro não foi alterado. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
+            }
+        } else {
+//            debug($negociacao);
+            $negociacao['Negociacao']['valor_imovel'] = str_replace('.', ',', $negociacao['Negociacao']['valor_imovel']);
+            $negociacao['Negociacao']['valor_proposta'] = str_replace('.', ',', $negociacao['Negociacao']['valor_proposta']);
+//            debug($negociacao);
+//            die();
+            $this->request->data = $negociacao;
+        }
+    }
+
+    /**
+     * delete method
+     */
+    public function delete($id = null) {
+
+        $this->Negociacao->id = $id;
+        if (!$this->Negociacao->exists()) {
+            $this->Session->setFlash('Registro não encontrado.', 'default', array('class' => 'mensagem_erro'));
+            $this->redirect(array('action' => 'index'));
+        }
+
+        if ($this->Negociacao->delete()) {
+            $this->Session->setFlash('Registro deletado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
+            $this->redirect(array('action' => 'index'));
+        }
+        $this->Session->setFlash('Registro não foi deletado.', 'default', array('class' => 'mensagem_erro'));
+        $this->redirect(array('action' => 'index'));
+    }
+
+    /**
+     * indicadores method
+     */
+    public function indicadores() {
+
+        $piechart = new GoogleCharts();
+        $piechart->type("PieChart");
+        $piechart->options(array(
+            'width' => '80%',
+            'title' => '',
+            'titleTextStyle' => array('color' => 'blue'),
+            'fontSize' => 12));
+        $piechart->columns(array(
+            'status' => array(
+                'type' => 'string',
+                'label' => 'Status'
+            ),
+            'cont' => array(
+                'type' => 'number',
+                'label' => 'Quantidade',
+                'format' => '#,###',
+                'role' => 'annotation'
+            )
+        ));
+
+        $result = $this->Negociacao->query('select count(*) cont,
+                                                   CASE WHEN status = ' . "'E'" . ' THEN' . "'EM ANDAMENTO'" . '
+                                                        WHEN status = ' . "'A'" . 'THEN ' . "'ACEITO'" . '
+                                                        WHEN status = ' . "'F'" . 'THEN ' . "'FINALIZADO'" . '
+                                                        ELSE ' . "'CANCELADO'" . ' END as status
+                                              from negociacaos
+                                              group by status');
+
+        foreach ($result as $key => $item) :
+            $piechart->addRow(array('status' => $item[0]['status'], $item[0]['status'], 'cont' => $item[0]['cont']));
+        endforeach;
+
+        $this->set(compact('piechart'));
+
+        //
+        //VALOR EM PROPOSTAS
+        //
+        $piechart_proposta = new GoogleCharts();
+        $piechart_proposta->type("PieChart");
+        $piechart_proposta->options(array(
+            'width' => '80%',
+            'title' => '',
+            'titleTextStyle' => array('color' => 'blue'),
+            'fontSize' => 12));
+        $piechart_proposta->columns(array(
+            'status' => array(
+                'type' => 'string',
+                'label' => 'Status'
+            ),
+            'valor_proposta' => array(
+                'type' => 'number',
+                'label' => 'Quantidade',
+                'format' => '#,###',
+                'role' => 'annotation'
+            )
+        ));
+
+        $result = $this->Negociacao->query('select sum(valor_proposta) valor_proposta,
+                                                   CASE WHEN status = ' . "'E'" . ' THEN' . "'EM ANDAMENTO'" . '
+                                                        WHEN status = ' . "'A'" . 'THEN ' . "'ACEITO'" . '
+                                                        WHEN status = ' . "'F'" . 'THEN ' . "'FINALIZADO'" . '
+                                                        ELSE ' . "'CANCELADO'" . ' END as status
+                                              from negociacaos
+                                              group by status');
+
+        foreach ($result as $key => $item) :
+            $piechart_proposta->addRow(array('status' => $item[0]['status'], $item[0]['status'], 'valor_proposta' => round($item[0]['valor_proposta'], 2)));
+        endforeach;
+
+        $this->set(compact('piechart_proposta'));
+    }
+
+}

@@ -1,0 +1,3 @@
+debug($this->Caracteristica->validationErrors); //show validationErrors
+debug($this->Caracteristica->getDataSource()->getLog(false, false));
+die();
