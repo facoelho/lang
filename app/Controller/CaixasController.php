@@ -30,6 +30,8 @@ class CaixasController extends AppController {
 
         $conditions = array();
 
+        //teste
+
         $dadosUser = $this->Session->read();
         $this->set('adminholding', $dadosUser['Auth']['User']['adminholding']);
 
