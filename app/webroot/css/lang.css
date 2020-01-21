@@ -1207,3 +1207,17 @@ div#direita{
     padding-bottom: 0px;
     margin-right: 0;
 }
+
+#contasreceber{
+    position: relative;
+    float: right;
+    width: 40%;
+    height: 170px;
+    font: 12px tahoma, arial;
+    color: #000000;
+    margin-left: 0;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-right: 3%;
+    overflow-y: scroll;
+}

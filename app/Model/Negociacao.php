@@ -51,6 +51,26 @@ class Negociacao extends AppModel {
                 'rule' => array('notempty'),
             ),
         ),
+        'honorarios' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+            ),
+        ),
+        'perc_fechamento' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+            ),
+        ),
+        'vgv_final' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+            ),
+        ),
+        'dtvenda' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+            ),
+        ),
     );
 
     /**
@@ -89,6 +109,19 @@ class Negociacao extends AppModel {
         ),
         'Negociacaohistorico' => array(
             'className' => 'Negociacaohistorico',
+            'foreignKey' => 'negociacao_id',
+            'dependent' => true,
+            'conditions' => '',
+            'fields' => '',
+            'order' => '',
+            'limit' => '',
+            'offset' => '',
+            'exclusive' => true,
+            'finderQuery' => '',
+            'counterQuery' => ''
+        ),
+        'Contasreceber' => array(
+            'className' => 'Contasreceber',
             'foreignKey' => 'negociacao_id',
             'dependent' => true,
             'conditions' => '',

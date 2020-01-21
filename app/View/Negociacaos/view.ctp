@@ -1,8 +1,35 @@
 <?php
 echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => "Retornar", "title" => "Retornar")), array('action' => 'index'), array('escape' => false, 'onclick' => 'history.go(-1); return false;'));
+$cont = 1;
 ?>
 <br>
 <br>
+<?php if (!empty($negociacao['Contasreceber'][0]['id'])) { ?>
+    <div id="contasreceber">
+        <table border="1" style ="width:100%">
+            <tr>
+                <th>Parcela</th>
+                <th>Vencimento</th>
+                <th>Valor parcela</th>
+                <th>Pagamento</th>
+            </tr>
+            <?php $result = $this->requestAction('/Contasrecebers/busca_parcelas', array('pass' => array($negociacao['Contasreceber'][0]['id']))); ?>
+            <?php foreach ($result as $key => $item): ?>
+                <tr>
+                    <td><?php echo $cont; ?></td>
+                    <td><?php echo date('d/m/Y', strtotime($item[0]['dtvencimento'])); ?></td>
+                    <td><?php echo number_format($item[0]['valorparcela'], 2, ",", "."); ?></td>
+                    <?php if (!empty($item[0]['dtpagamento'])) { ?>
+                        <td><strong><font color="green"><?php echo date('d/m/Y', strtotime($item[0]['dtpagamento'])); ?></font></strong></td>
+                    <?php } else { ?>
+                        <td><?php echo ''; ?></td>
+                    <?php } ?>
+                </tr>
+                <?php $cont++; ?>
+            <?php endforeach; ?>
+        </table>
+    </div>
+<?php } ?>
 <p>
     <strong> Id: </strong>
     <?php echo $negociacao['Negociacao']['id']; ?>

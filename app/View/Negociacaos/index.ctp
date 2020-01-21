@@ -7,6 +7,8 @@ echo $this->Html->link($this->Html->image("botoes/graficos.png", array("alt" => 
 <div id="filtroGrade">
     <?php
     echo $this->Search->create();
+    echo $this->Search->input('filter6', array('id' => 'corretorID', 'class' => 'select-box', 'placeholder' => 'Corretores', 'empty' => '-- Corretores --'));
+    echo $this->Html->image("separador.png");
     echo $this->Search->input('filter1', array('class' => 'input-box', 'placeholder' => 'Referência'));
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter2', array('class' => 'input-box', 'placeholder' => 'Cliente vendedor'));
@@ -79,7 +81,15 @@ echo $this->Html->link($this->Html->image("botoes/graficos.png", array("alt" => 
             <td>
                 <div id="botoes">
                     <?php
+                    if (!empty($item['Negociacao']['dtalerta'])) {
+                        if (date('Y-m-d') <= date('Y-m-d', strtotime($item['Negociacao']['dtalerta']))) {
+                            echo $this->Html->link($this->Html->image("botoes/alerta_min.png", array("alt" => "Alerta", "title" => "Alerta")), array('action' => ''), array('escape' => false));
+                        }
+                    }
                     echo $this->Html->link($this->Html->image("botoes/view_2_min.png", array("alt" => "Visualizar", "title" => "Visualizar")), array('action' => 'view', $item['Negociacao']['id']), array('escape' => false));
+                    if (empty($item['Contasreceber'])) {
+                        echo $this->Html->link($this->Html->image("botoes/pagar.png", array("alt" => "Lançar pagamento", "title" => "Lançar pagamento")), array('action' => 'pagar', $item['Negociacao']['id']), array('escape' => false));
+                    }
                     echo $this->Html->link($this->Html->image("botoes/add_min.png", array("alt" => "Próxima ação", "title" => "Próxima ação")), array('controller' => 'Negociacaohistoricos', 'action' => 'add', $item['Negociacao']['id']), array('escape' => false));
                     echo $this->Html->link($this->Html->image("botoes/status.png", array("alt" => "Próximo status", "title" => "Próximo status")), array('controller' => 'Negociacaostats', 'action' => 'add', $item['Negociacao']['id']), array('escape' => false));
                     echo $this->Html->link($this->Html->image("botoes/editar_min.png", array("alt" => "Editar", "title" => "Editar")), array('action' => 'edit', $item['Negociacao']['id']), array('escape' => false));

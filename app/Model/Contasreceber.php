@@ -3,10 +3,10 @@
 App::uses('AppModel', 'Model');
 
 /**
- * Corretor Model
+ * Contasreceber Model
  *
  */
-class Corretor extends AppModel {
+class Contasreceber extends AppModel {
 
     /**
      * Validation rules
@@ -14,17 +14,24 @@ class Corretor extends AppModel {
      * @var array
      */
     public $validate = array(
-        'nome' => array(
+        'negociacao_id' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
             ),
         ),
-        'email' => array(
+        'valor_total' => array(
+            'notEmpty' => array(
+                'rule' => 'notEmpty',
+                'allowEmpty' => true,
+                'last' => false
+            ),
+        ),
+        'saldo' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
             ),
         ),
-        'gerente' => array(
+        'parcelas' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
             ),
@@ -37,41 +44,31 @@ class Corretor extends AppModel {
      * @var array
      */
     public $belongsTo = array(
+        'User' => array(
+            'className' => 'User',
+            'foreignKey' => 'user_id',
+            'conditions' => '',
+            'fields' => '',
+            'order' => ''
+        ),
+        'Negociacao' => array(
+            'className' => 'Negociacao',
+            'foreignKey' => 'negociacao_id',
+            'conditions' => '',
+            'fields' => '',
+            'order' => ''
+        ),
     );
 
     /**
      * hasMany associations
+     *
+     * @var array
      */
     public $hasMany = array(
-        'Lead' => array(
-            'className' => 'Lead',
-            'foreignKey' => 'corretor_id',
-            'dependent' => true,
-            'conditions' => '',
-            'fields' => '',
-            'order' => '',
-            'limit' => '',
-            'offset' => '',
-            'exclusive' => true,
-            'finderQuery' => '',
-            'counterQuery' => ''
-        ),
-        'Desempenhoindivid' => array(
-            'className' => 'Desempenhoindivid',
-            'foreignKey' => 'corretor_id',
-            'dependent' => true,
-            'conditions' => '',
-            'fields' => '',
-            'order' => '',
-            'limit' => '',
-            'offset' => '',
-            'exclusive' => true,
-            'finderQuery' => '',
-            'counterQuery' => ''
-        ),
-        'Negociacaocorretor' => array(
-            'className' => 'Negociacaocorretor',
-            'foreignKey' => 'corretor_id',
+        'Contasrecebermov' => array(
+            'className' => 'Contasrecebermov',
+            'foreignKey' => 'contasreceber_id',
             'dependent' => true,
             'conditions' => '',
             'fields' => '',

@@ -47,7 +47,6 @@ $retiradas = 0;
                     ?>
                 </div>
             </td>
-        <a href="../Lancamentos/edit_lancamento.ctp"></a>
         </tr>
         <?php if ($item['Categoria']['tipo'] == 'E') { ?>
             <?php $entradas = $entradas + $item['Lancamento']['valor']; ?>

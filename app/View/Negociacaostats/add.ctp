@@ -8,6 +8,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
     <?php
     echo $this->Form->input('Negociacaostat.status', array('id' => 'statusID', 'options' => $status, 'label' => 'Status'));
     echo $this->Form->input('obs', array('id' => 'obs', 'label' => 'Observação'));
+    echo $this->Form->input('valor_imovel', array('id' => 'valor_imovel', 'type' => 'text', 'label' => false, 'value' => $negociacao['Negociacao']['valor_proposta'], 'hidden'));
     ?>
 </fieldset>
 <?php echo $this->Form->end(__('Adicionar')); ?>

@@ -298,7 +298,34 @@ class LancamentosController extends AppController {
      */
     public function delete_lancamento($caixa_id = null, $lancamento_id = null) {
 
-        $this->Lancamento->query('delete from lancamentos where id = ' . $lancamento_id . ' and caixa_id = ' . $caixa_id);
+        try {
+
+            $this->Lancamento->begin();
+
+//            $this->Lancamento->create();
+
+            $caixa = $this->Lancamento->query('select dtcaixa from caixas where id = ' . $caixa_id);
+
+            $moviment = $this->Lancamento->query('select contasrecebermov_id, valor from lancamentos where id = ' . $lancamento_id . ' and caixa_id = ' . $caixa_id);
+
+            $this->Lancamento->query('delete from lancamentos where id = ' . $lancamento_id . ' and caixa_id = ' . $caixa_id);
+
+            if (!empty($moviment[0][0]['contasrecebermov_id'])) {
+                $contasreceber = $this->Lancamento->query('select contasreceber_id from contasrecebermovs where id = ' . $moviment[0][0]['contasrecebermov_id']);
+                $this->Lancamento->query('update contasrecebers
+                                             set status = ' . "'A'" . '
+                                           where id = ' . $contasreceber[0][0]['contasreceber_id']);
+
+                $this->Lancamento->query('update contasrecebermovs
+                                             set dtpagamento = ' . "null" . '
+                                           where id = ' . $moviment[0][0]['contasrecebermov_id']);
+            }
+
+            $this->Lancamento->commit();
+        } catch (Exception $caixa_id) {
+            $this->Lancamento->rollback();
+            $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
+        }
 
         $this->redirect(array('controller' => 'Caixas', 'action' => 'confere_caixa/' . $caixa_id));
     }

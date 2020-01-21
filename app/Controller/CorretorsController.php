@@ -50,12 +50,20 @@ class CorretorsController extends AppController {
      */
     public function add() {
 
+        $opcoes = array('N' => 'NÃO', 'S' => 'SIM');
+        $this->set('opcoes', $opcoes);
+
         $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
             'conditions' => array('gerencia' => 'S'),
             'order' => array('nome')));
         $this->set('corretors', $corretors);
 
         if ($this->request->is('post')) {
+
+            if ($this->request->data['Corretor']['gerencia'] == 'S') {
+                $this->request->data['Corretor']['gerente_equipe'] = '';
+            }
+
             $this->Corretor->create();
             if ($this->Corretor->save($this->request->data)) {
                 $this->Session->setFlash('Corretor adicionado com sucesso!', 'default', array('class' => 'mensagem_sucesso'));
@@ -77,14 +85,24 @@ class CorretorsController extends AppController {
             $this->redirect(array('action' => 'index'));
         }
 
+        $opcoes = array('N' => 'NÃO', 'S' => 'SIM');
+        $this->set('opcoes', $opcoes);
+
         $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
             'conditions' => array('gerencia' => 'S'),
             'order' => array('nome')));
         $this->set('corretors', $corretors);
 
+        $this->Corretor->recursive = 0;
+
         $corretors = $this->Corretor->read(null, $id);
 
         if ($this->request->is('post') || $this->request->is('put')) {
+
+            if ($this->request->data['Corretor']['gerencia'] == 'S') {
+                $this->request->data['Corretor']['gerente_equipe'] = '';
+            }
+
             if ($this->Corretor->save($this->request->data)) {
                 $this->Session->setFlash('Corretor alterado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
                 $this->redirect(array('action' => 'index'));

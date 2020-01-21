@@ -27,12 +27,22 @@ class NegociacaosController extends AppController {
 
         $this->set('adminholding', $dadosUser['Auth']['User']['adminholding']);
 
-        $status = array('E' => 'EM ANDAMENTO', 'A' => 'ACEITA', 'F' => 'FINALIZADO', 'C' => 'CANCELADO');
+        $status = array('E' => 'EM ANDAMENTO', 'F' => 'FINALIZADO', 'C' => 'CANCELADO');
+
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
 
         $this->Negociacao->recursive = 1;
 
         $this->Filter->addFilters(
                 array(
+                    'filter6' => array(
+                        'Negociacaocorretor.corretor_id' => array(
+                            'select' => $corretors
+                        ),
+                    ),
                     'filter1' => array(
                         'Negociacao.referencia' => array(
                             'operator' => 'ILIKE',
@@ -86,6 +96,22 @@ class NegociacaosController extends AppController {
         if (empty($filter_status)) {
             $conditions[] = 'Negociacao.status NOT IN (' . "'F', 'C'" . ')';
         }
+
+        $this->Paginator->settings = array(
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.dtalerta', 'Negociacao.referencia', 'Negociacao.unidade', 'Negociacao.endereco', 'Negociacao.cliente_vendedor',
+                'Negociacao.cliente_comprador', 'Negociacao.valor_imovel', 'Negociacao.valor_proposta', 'Negociacao.status', 'Negociacao.dt_ultima_etapa'),
+            'joins' => array(
+                array(
+                    'table' => 'negociacaocorretors',
+                    'alias' => 'Negociacaocorretor',
+                    'type' => 'INNER',
+                    'conditions' => [
+                        'Negociacaocorretor.negociacao_id = Negociacao.id',
+                    ],
+                ),
+            ),
+            'order' => array('Negociacao.dt_ultima_etapa' => 'desc')
+        );
 
         $this->Filter->setPaginate('conditions', array($this->Filter->getConditions(), $conditions));
 
@@ -213,12 +239,50 @@ class NegociacaosController extends AppController {
                 $this->Session->setFlash('Registro não foi alterado. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
         } else {
-//            debug($negociacao);
             $negociacao['Negociacao']['valor_imovel'] = str_replace('.', ',', $negociacao['Negociacao']['valor_imovel']);
             $negociacao['Negociacao']['valor_proposta'] = str_replace('.', ',', $negociacao['Negociacao']['valor_proposta']);
-//            debug($negociacao);
-//            die();
             $this->request->data = $negociacao;
+        }
+    }
+
+    /**
+     * pagar method
+     */
+    public function pagar($id) {
+
+        $dadosUser = $this->Session->read();
+
+        $this->Negociacao->recursive = 0;
+
+        $negociacao = $this->Negociacao->read(null, $id);
+
+        $this->set('negociacao', $negociacao);
+
+        if ($this->request->is('post')) {
+
+            $this->Negociacao->id = $id;
+
+            $this->request->data['Negociacao']['honorarios'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['honorarios']));
+            $this->request->data['Negociacao']['perc_fechamento'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['perc_fechamento']));
+            $this->request->data['Negociacao']['vgv_final'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['vgv_final']));
+            $this->request->data['Negociacao']['dtvenda'] = substr($this->request->data['Negociacao']['dtvenda'], 6, 4) . "-" . substr($this->request->data['Negociacao']['dtvenda'], 3, 2) . "-" . substr($this->request->data['Negociacao']['dtvenda'], 0, 2);
+
+            if ($this->Negociacao->save($this->request->data)) {
+
+                //Insere contas a receber
+                $this->request->data['Negociacao']['Contasreceber']['negociacao_id'] = $id;
+                $this->request->data['Negociacao']['Contasreceber']['valor_total'] = $this->request->data['Negociacao']['honorarios'];
+                $this->request->data['Negociacao']['Contasreceber']['status'] = 'A';
+                $this->request->data['Negociacao']['Contasreceber']['user_id'] = $dadosUser['Auth']['User']['id'];
+                $this->request->data['Negociacao']['Contasreceber']['created'] = date('Y-m-d H:i:s');
+
+                $this->Negociacao->Contasreceber->save($this->request->data['Negociacao']['Contasreceber']);
+
+                $this->Session->setFlash('Registro adicionado com sucesso!', 'default', array('class' => 'mensagem_sucesso'));
+                $this->redirect(array('controller' => 'Negociacaos', 'action' => 'index'));
+            } else {
+                $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
+            }
         }
     }
 

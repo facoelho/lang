@@ -42,7 +42,7 @@ class HoldingsController extends AppController {
 
         if ($this->request->is('post')) {
             $this->Holding->create();
-            $this->request->data['Holding']['validade'] = substr($this->request->data['datepicker'], 6, 4) . "-" . substr($this->request->data['datepicker'], 3, 2) . "-" . substr($this->request->data['datepicker'], 0, 2) . " 00:00:00";
+            $this->request->data['Holding']['validade'] = substr($this->request->data['datepicker'], 6, 4) . "-" . substr($this->request->data['datepicker'], 3, 2) . "-" . substr($this->request->data['datepicker'], 0, 2);
             if ($this->Holding->save($this->request->data)) {
                 $this->Session->setFlash('Holding adicionada com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
                 $this->redirect(array('action' => 'index'));

@@ -23,6 +23,12 @@ class NegociacaostatsController extends AppController {
         $status = array('E' => 'EM ANDAMENTO', 'A' => 'ACEITA', 'F' => 'FINALIZADO', 'C' => 'CANCELADO');
         $this->set('status', $status);
 
+        $this->Negociacaostat->Negociacao->recursive = 0;
+
+        $negociacao = $this->Negociacaostat->Negociacao->read(null, $id);
+
+        $this->set('negociacao', $negociacao);
+
         if ($this->request->is('post')) {
 
             $this->request->data['Negociacaostat']['negociacao_id'] = $id;
@@ -30,11 +36,8 @@ class NegociacaostatsController extends AppController {
             $this->request->data['Negociacaostat']['created'] = date('Y-m-d');
 
             $this->Negociacaostat->create();
+
             if ($this->Negociacaostat->save($this->request->data)) {
-
-                $this->Negociacaostat->Negociacao->id = $id;
-                $this->Negociacaostat->Negociacao->saveField('status', $this->request->data['Negociacaostat']['status']);
-
                 $this->Session->setFlash('Registro adicionado com sucesso!', 'default', array('class' => 'mensagem_sucesso'));
                 $this->redirect(array('controller' => 'Negociacaos', 'action' => 'index'));
             } else {

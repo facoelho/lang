@@ -525,7 +525,7 @@ class CaixasController extends AppController {
 
         if (!empty($indices['Relatorio']['filhas'])) {
             if (empty($categorias_pai) and (!empty($indices['Relatorio']['filhas']))) {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                      from categorias,
                                                           lancamentos,
                                                           caixas
@@ -534,9 +534,9 @@ class CaixasController extends AppController {
                                                       and caixas.empresa_id = ' . $empresa_id . '
                                                       and lancamentos.categoria_id = categorias.id
                                                       and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                    group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                    group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                              categorias.descricao
-                                                    order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                    order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                              sum(valor) desc');
 
                 $columns['data'] = array('type' => 'string', 'label' => 'Data');
@@ -599,7 +599,7 @@ class CaixasController extends AppController {
                     )
                 ));
 
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -608,14 +608,14 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
 
                 foreach ($datas as $d => $data):
                     $string = '';
                     $string_fim = '';
                     $string['data'] = $data[0]['anomes'];
 
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -624,10 +624,10 @@ class CaixasController extends AppController {
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
                                                      and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
 
                     foreach ($result as $k => $item):
@@ -664,7 +664,7 @@ class CaixasController extends AppController {
         if (empty($categorias_pai) and (empty($indices['Relatorio']['filhas']))) {
             //Relatório Valor Total X categoria
             if (!empty($tipo)) {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categoriapai.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categoriapai.descricao, sum(valor)::float as valor
                                                  from categorias,
                                                       lancamentos,
                                                       caixas,
@@ -675,12 +675,12 @@ class CaixasController extends AppController {
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
                                                   and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          categoriapai.descricao
-                                                order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          sum(valor) desc');
             } else {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categoriapai.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categoriapai.descricao, sum(valor)::float as valor
                                                  from categorias,
                                                       lancamentos,
                                                       caixas,
@@ -690,9 +690,9 @@ class CaixasController extends AppController {
                                                   and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
-                                                group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          categoriapai.descricao
-                                                order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          sum(valor) desc');
             }
 
@@ -717,7 +717,7 @@ class CaixasController extends AppController {
             $column_chart->columns($columns);
 
             if (!empty($tipo)) {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas,
@@ -728,9 +728,9 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             } else {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas,
@@ -740,7 +740,7 @@ class CaixasController extends AppController {
                                                  and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             }
 
             foreach ($datas as $d => $data):
@@ -749,7 +749,7 @@ class CaixasController extends AppController {
                 $string['data'] = $data[0]['anomes'];
 
                 if (!empty($tipo)) {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categoriapai.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categoriapai.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas,
@@ -760,13 +760,13 @@ class CaixasController extends AppController {
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
                                                      and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categoriapai.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 } else {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categoriapai.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categoriapai.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas,
@@ -776,10 +776,10 @@ class CaixasController extends AppController {
                                                      and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categoriapai.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 }
                 foreach ($result as $k => $item):
@@ -795,7 +795,7 @@ class CaixasController extends AppController {
             //Relatório Linha
 
             if (!empty($tipo)) {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categoriapai.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categoriapai.descricao, sum(valor)::float as valor
                                                  from categorias,
                                                       lancamentos,
                                                       caixas,
@@ -806,12 +806,12 @@ class CaixasController extends AppController {
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
                                                   and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          categoriapai.descricao
-                                                order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          sum(valor) desc');
             } else {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categoriapai.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categoriapai.descricao, sum(valor)::float as valor
                                                  from categorias,
                                                       lancamentos,
                                                       caixas,
@@ -821,9 +821,9 @@ class CaixasController extends AppController {
                                                   and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
-                                                group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          categoriapai.descricao
-                                                order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          sum(valor) desc');
             }
 
@@ -848,7 +848,7 @@ class CaixasController extends AppController {
             $column_chart_linha->columns($columns_linha);
 
             if (!empty($tipo)) {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas,
@@ -859,9 +859,9 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             } else {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas,
@@ -871,7 +871,7 @@ class CaixasController extends AppController {
                                                  and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             }
 
             foreach ($datas as $d => $data):
@@ -880,7 +880,7 @@ class CaixasController extends AppController {
                 $string['data'] = $data[0]['anomes'];
 
                 if (!empty($tipo)) {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categoriapai.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categoriapai.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas,
@@ -892,12 +892,12 @@ class CaixasController extends AppController {
                                                      and lancamentos.categoria_id = categorias.id
                                                      and categorias.tipo = ' . "'" . $tipo . "'" . '
                                                      and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categoriapai.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 } else {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categoriapai.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categoriapai.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas,
@@ -907,10 +907,10 @@ class CaixasController extends AppController {
                                                      and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categoriapai.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 }
 
@@ -991,7 +991,7 @@ class CaixasController extends AppController {
             //Relatório Valor Total x Categorias - Barras
 
             if (!empty($tipo)) {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                  from categorias,
                                                       lancamentos,
                                                       caixas
@@ -1001,12 +1001,12 @@ class CaixasController extends AppController {
                                                   and lancamentos.categoria_id = categorias.id
                                                   and categorias.tipo = ' . "'" . $tipo . "'" . '
                                                   and caixas.id = lancamentos.caixa_id
-                                                group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          sum(valor)::float desc');
             } else {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                  from categorias,
                                                       lancamentos,
                                                       caixas
@@ -1015,9 +1015,9 @@ class CaixasController extends AppController {
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
                                                   and caixas.id = lancamentos.caixa_id
-                                                group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          sum(valor)::float desc');
             }
 
@@ -1042,7 +1042,7 @@ class CaixasController extends AppController {
             $column_chart->columns($columns);
 
             if (!empty($tipo)) {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1053,9 +1053,9 @@ class CaixasController extends AppController {
                                                  and lancamentos.categoria_id = categorias.id
                                                  and caixas.id = lancamentos.caixa_id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             } else {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1065,7 +1065,7 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and caixas.id = lancamentos.caixa_id
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             }
 
             foreach ($datas as $d => $data):
@@ -1074,7 +1074,7 @@ class CaixasController extends AppController {
                 $string['data'] = $data[0]['anomes'];
 
                 if (!empty($tipo)) {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -1085,13 +1085,13 @@ class CaixasController extends AppController {
                                                      and lancamentos.categoria_id = categorias.id
                                                      and categorias.tipo = ' . "'" . $tipo . "'" . '
                                                      and caixas.id = lancamentos.caixa_id
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 } else {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -1101,10 +1101,10 @@ class CaixasController extends AppController {
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
                                                      and caixas.id = lancamentos.caixa_id
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor)::float desc');
                 }
                 foreach ($result as $k => $item):
@@ -1119,7 +1119,7 @@ class CaixasController extends AppController {
 
             //Relatório Valor Total x Categorias - Linhas
             if (!empty($tipo)) {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1128,12 +1128,12 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                               group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                         categorias.descricao
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                         sum(valor) desc');
             } else {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1141,9 +1141,9 @@ class CaixasController extends AppController {
                                                  and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
-                                               group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                               group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                         categorias.descricao
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                         sum(valor) desc');
             }
 
@@ -1168,7 +1168,7 @@ class CaixasController extends AppController {
             $column_chart_linha->columns($columns_linha);
 
             if (!empty($tipo)) {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1178,9 +1178,9 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             } else {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1189,7 +1189,7 @@ class CaixasController extends AppController {
                                                  and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             }
 
             foreach ($datas as $d => $data):
@@ -1198,7 +1198,7 @@ class CaixasController extends AppController {
                 $string['data'] = $data[0]['anomes'];
 
                 if (!empty($tipo)) {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -1208,13 +1208,13 @@ class CaixasController extends AppController {
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
                                                      and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 } else {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -1223,10 +1223,10 @@ class CaixasController extends AppController {
                                                      and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 }
 
@@ -1300,7 +1300,7 @@ class CaixasController extends AppController {
             //Relatório Valor Total x Categorias - Barras
 
             if (!empty($tipo)) {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                  from categorias,
                                                       lancamentos,
                                                       caixas
@@ -1309,12 +1309,12 @@ class CaixasController extends AppController {
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
                                                   and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          categorias.descricao
-                                                order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          sum(valor) desc');
             } else {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                  from categorias,
                                                       lancamentos,
                                                       caixas
@@ -1322,9 +1322,9 @@ class CaixasController extends AppController {
                                                   and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
-                                                group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          categorias.descricao
-                                                order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                          sum(valor) desc');
             }
 
@@ -1349,7 +1349,7 @@ class CaixasController extends AppController {
             $column_chart->columns($columns);
 
             if (!empty($tipo)) {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1359,9 +1359,9 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             } else {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1370,7 +1370,7 @@ class CaixasController extends AppController {
                                                  and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             }
 
 
@@ -1380,7 +1380,7 @@ class CaixasController extends AppController {
                 $string['data'] = $data[0]['anomes'];
 
                 if (!empty($tipo)) {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -1390,13 +1390,13 @@ class CaixasController extends AppController {
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
                                                      and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 } else {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -1405,10 +1405,10 @@ class CaixasController extends AppController {
                                                      and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 }
 
@@ -1424,7 +1424,7 @@ class CaixasController extends AppController {
 
             //Relatório Valor Total x Categorias - Linhas
             if (!empty($tipo)) {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1433,12 +1433,12 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                               group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                         categorias.descricao
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                         sum(valor) desc');
             } else {
-                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1446,9 +1446,9 @@ class CaixasController extends AppController {
                                                  and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
-                                               group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                               group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                         categorias.descricao
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                         sum(valor) desc');
             }
 
@@ -1473,7 +1473,7 @@ class CaixasController extends AppController {
             $column_chart_linha->columns($columns_linha);
 
             if (!empty($tipo)) {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1483,9 +1483,9 @@ class CaixasController extends AppController {
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
                                                  and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             } else {
-                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes
+                $datas = $this->Caixa->query('select distinct SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes
                                                 from categorias,
                                                      lancamentos,
                                                      caixas
@@ -1494,7 +1494,7 @@ class CaixasController extends AppController {
                                                  and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                  and caixas.empresa_id = ' . $empresa_id . '
                                                  and lancamentos.categoria_id = categorias.id
-                                               order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4)');
+                                               order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2)');
             }
 
             foreach ($datas as $d => $data):
@@ -1503,7 +1503,7 @@ class CaixasController extends AppController {
                 $string['data'] = $data[0]['anomes'];
 
                 if (!empty($tipo)) {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -1513,13 +1513,13 @@ class CaixasController extends AppController {
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
                                                      and categorias.tipo = ' . "'" . $tipo . "'" . '
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 } else {
-                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4) as anomes, categorias.descricao, sum(valor)::float as valor
+                    $result = $this->Caixa->query('select SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2) as anomes, categorias.descricao, sum(valor)::float as valor
                                                     from categorias,
                                                          lancamentos,
                                                          caixas
@@ -1528,10 +1528,10 @@ class CaixasController extends AppController {
                                                      and caixas.dtcaixa BETWEEN ' . "'" . substr($indices['Relatorio']['dtdespesa_inicio'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_inicio'], 0, 2) . " 00:00:00'" . ' AND ' . "'" . substr($indices['Relatorio']['dtdespesa_fim'], 6, 4) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 3, 2) . '-' . substr($indices['Relatorio']['dtdespesa_fim'], 0, 2) . " 23:59:59'" . '
                                                      and caixas.empresa_id = ' . $empresa_id . '
                                                      and lancamentos.categoria_id = categorias.id
-                                                     and to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
-                                                   group by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                     and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['anomes'] . "'" . '
+                                                   group by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             categorias.descricao
-                                                   order by SUBSTRING(dtcaixa::varchar, 6,2) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 1,4),
+                                                   order by SUBSTRING(dtcaixa::varchar, 1,4) ||' . "'-'" . '|| SUBSTRING(dtcaixa::varchar, 6,2),
                                                             sum(valor) desc');
                 }
                 foreach ($result as $k => $item):
@@ -1645,7 +1645,7 @@ class CaixasController extends AppController {
 
         $indices = $this->Session->read('relatorio');
 
-        $result = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') as mesano,
+        $result = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') as mesano,
                                               case when (categorias.tipo = ' . "'E'" . ') then ' . "'Entradas'" . '
                                               else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . '
                                               else case when (categorias.tipo = ' . "'R'" . ') then ' . "'Retiradas'" . ' end end end as tipo,
@@ -1661,8 +1661,8 @@ class CaixasController extends AppController {
                                           and caixas.empresa_id = ' . $empresa_id . '
                                           and lancamentos.categoria_id = categorias.id
                                           and categorias.ativo = ' . "'S'" . '
-                                        group by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . '), categorias.tipo
-                                        order by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') asc, ordem asc');
+                                        group by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . '), categorias.tipo
+                                        order by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') asc, ordem asc');
 
         $this->set('result', $result);
 
@@ -1691,7 +1691,7 @@ class CaixasController extends AppController {
 
         $column_chart_linha->columns($columns_linha);
 
-        $datas = $this->Caixa->query('select distinct to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') as mesano
+        $datas = $this->Caixa->query('select distinct to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') as mesano
                                         from categorias,
                                              lancamentos,
                                              caixas
@@ -1700,15 +1700,15 @@ class CaixasController extends AppController {
                                          and caixas.empresa_id = ' . $empresa_id . '
                                          and lancamentos.categoria_id = categorias.id
                                          and categorias.ativo = ' . "'S'" . '
-                                       group by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ')
-                                       order by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') asc');
+                                       group by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ')
+                                       order by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') asc');
 
         foreach ($datas as $d => $data):
             $string = '';
             $string_fim = '';
             $string['data'] = $data[0]['mesano'];
 
-            $result_aux = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') as mesano,
+            $result_aux = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') as mesano,
                                                       case when (categorias.tipo = ' . "'E'" . ') then ' . "'Entradas'" . '
                                                       else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . '
                                                       else case when (categorias.tipo = ' . "'R'" . ') then ' . "'Retiradas'" . ' end end end as tipo,
@@ -1720,12 +1720,12 @@ class CaixasController extends AppController {
                                                       lancamentos,
                                                       caixas
                                                 where caixas.id = lancamentos.caixa_id
-                                                  and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . substr($data[0]['mesano'], 3, 4) . '-' . substr($data[0]['mesano'], 0, 2) . "'" . '
+                                                  and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['mesano'] . "'" . '
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
                                                   and categorias.ativo = ' . "'S'" . '
-                                                group by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . '), categorias.tipo
-                                                order by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') asc, ordem asc');
+                                                group by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . '), categorias.tipo
+                                                order by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') asc, ordem asc');
 
             $entradas = 0;
             $saidas = 0;
@@ -1781,7 +1781,7 @@ class CaixasController extends AppController {
 
         $column_chart_barras->columns($columns_barras);
 
-        $datas = $this->Caixa->query('select distinct to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') as mesano
+        $datas = $this->Caixa->query('select distinct to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') as mesano
                                         from categorias,
                                              lancamentos,
                                              caixas
@@ -1790,15 +1790,15 @@ class CaixasController extends AppController {
                                          and caixas.empresa_id = ' . $empresa_id . '
                                          and lancamentos.categoria_id = categorias.id
                                          and categorias.ativo = ' . "'S'" . '
-                                       group by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ')
-                                       order by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') asc');
+                                       group by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ')
+                                       order by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') asc');
 
         foreach ($datas as $d => $data):
             $string = '';
             $string_fim = '';
             $string['data'] = $data[0]['mesano'];
 
-            $result_aux = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') as mesano,
+            $result_aux = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') as mesano,
                                                       case when (categorias.tipo = ' . "'E'" . ') then ' . "'Entradas'" . '
                                                       else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . '
                                                       else case when (categorias.tipo = ' . "'R'" . ') then ' . "'Retiradas'" . ' end end end as tipo,
@@ -1810,12 +1810,12 @@ class CaixasController extends AppController {
                                                       lancamentos,
                                                       caixas
                                                 where caixas.id = lancamentos.caixa_id
-                                                  and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . substr($data[0]['mesano'], 3, 4) . '-' . substr($data[0]['mesano'], 0, 2) . "'" . '
+                                                  and to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') = ' . "'" . $data[0]['mesano'] . "'" . '
                                                   and caixas.empresa_id = ' . $empresa_id . '
                                                   and lancamentos.categoria_id = categorias.id
                                                   and categorias.ativo = ' . "'S'" . '
-                                                group by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . '), categorias.tipo
-                                                order by to_char(caixas.dtcaixa, ' . "'mm-yyyy'" . ') asc, ordem asc');
+                                                group by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . '), categorias.tipo
+                                                order by to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') asc, ordem asc');
 
             $entradas = 0;
             $saidas = 0;

@@ -32,7 +32,12 @@ class NegociacaohistoricosController extends AppController {
             if ($this->Negociacaohistorico->save($this->request->data)) {
 
                 $this->Negociacaohistorico->Negociacao->id = $id;
-                $this->Negociacaohistorico->Negociacao->saveField('dt_ultima_etapa', $this->request->data['Negociacaohistorico']['created']);
+                $dtacao = $this->Negociacaohistorico->query('select dt_ultima_etapa from negociacaos where id = ' . $id);
+                if ($dtacao[0][0]['dt_ultima_etapa'] < $this->request->data['Negociacaohistorico']['created']) {
+                    $this->Negociacaohistorico->Negociacao->saveField('dt_ultima_etapa', $this->request->data['Negociacaohistorico']['created']);
+                } else {
+                    $this->Negociacaohistorico->Negociacao->saveField('dtalerta', date('Y-m-d'));
+                }
 
                 $this->Session->setFlash('Registro adicionado com sucesso!', 'default', array('class' => 'mensagem_sucesso'));
                 $this->redirect(array('controller' => 'Negociacaos', 'action' => 'index'));
