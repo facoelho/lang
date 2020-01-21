@@ -142,8 +142,6 @@ class ContasrecebersController extends AppController {
 
         $dadosUser = $this->Session->read();
 
-        $valor = 0;
-
         $this->Contasreceber->id = $id;
         if (!$this->Contasreceber->exists($id)) {
             $this->Session->setFlash('Registro não encontrado.', 'default', array('class' => 'mensagem_erro'));
