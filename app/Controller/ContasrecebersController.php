@@ -207,7 +207,7 @@ class ContasrecebersController extends AppController {
 
         $this->Paginator->settings = array(
             'fields' => array('Contasrecebermov.id', 'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento',
-                'Contasrecebermov.dtpagamento', 'Lancamento.contasrecebermov_id'),
+                'Contasrecebermov.dtpagamento', 'Lancamento.contasrecebermov_id', 'Contasrecebermov.contasreceber_id', 'Contasreceber.negociacao_id'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -301,6 +301,18 @@ class ContasrecebersController extends AppController {
                 $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
         }
+    }
+
+    public function delete_parcela($contasrecebermov_id = null, $contasreceber_id = null, $negociacao_id = null) {
+
+        $this->Contasreceber->query('delete from contasrecebermovs where id = ' . $contasrecebermov_id);
+
+        $result = $this->Contasreceber->query('select count(*) cont from contasrecebermovs where contasreceber_id = ' . $contasreceber_id);
+
+        $this->Contasreceber->query('update contasrecebers set parcelas = ' . $result[0][0]['cont'] . ' where id = ' . $contasreceber_id);
+
+        $this->Session->setFlash('Parcela deletada com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
+        $this->redirect(array('action' => 'pagar/' . $contasreceber_id . '/' . $negociacao_id));
     }
 
     public function calcula_saldo($id = null) {

@@ -89,6 +89,7 @@ class OrigensController extends AppController {
                 $this->Session->setFlash('Registro não foi alterado. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
         } else {
+            $origens['Origen']['valor_investido'] = str_replace('.', ',', $origens['Origen']['valor_investido']);
             $this->request->data = $origens;
         }
     }

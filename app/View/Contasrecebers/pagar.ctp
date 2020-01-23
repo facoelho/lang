@@ -1,5 +1,5 @@
 <?php
-echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => "Retornar", "title" => "Retornar")), array('action' => 'index'), array('escape' => false, 'onclick' => 'history.go(-1); return false;'));
+echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => "Retornar", "title" => "Retornar")), array('action' => 'index'), array('escape' => false));
 ?>
 <br>
 <br>
@@ -10,6 +10,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
             <th><?php echo 'Vencimento'; ?></th>
             <th><?php echo 'Valor parcela'; ?></th>
             <th><?php echo 'Data pagamento'; ?></th>
+            <th class="actions"><?php echo __('Ações'); ?></th>
         </tr>
         <?php foreach ($contasrecebers as $item): ?>
             <tr>
@@ -22,6 +23,16 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
                     <td><?php echo $this->Form->input('dtpagamento.' . $item['Contasrecebermov']['id'], array('id' => 'dtpagamento', 'type' => 'text', 'label' => false, 'style' => 'width:130px')); ?></td>
                 <?php } ?>
                 <?php echo $this->Form->input('valorparcela.' . $item['Contasrecebermov']['id'], array('id' => 'valorparcela', 'type' => 'hidden', 'label' => false, 'value' => $item['Contasrecebermov']['valorparcela'])); ?>
+                <td>
+                    <div id="botoes">
+                        <?php
+                        if (empty($item['Contasrecebermov']['dtpagamento'])) {
+                            echo $this->Html->link($this->Html->image('botoes/excluir_min.png', array('alt' => 'Exluir', 'title' => 'Exluir')), array('action' => 'delete_parcela', $item['Contasrecebermov']['id'], $item['Contasrecebermov']['contasreceber_id'], $item['Contasreceber']['negociacao_id']), array('escape' => false), __('Você realmete deseja apagar esse item?')
+                            );
+                        }
+                        ?>
+                    </div>
+                </td>
             </tr>
         <?php endforeach; ?>
     </table>

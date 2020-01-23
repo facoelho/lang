@@ -462,7 +462,7 @@ class CaixasController extends AppController {
         $filhas = array('S' => 'SIM');
         $this->set('filhas', $filhas);
 
-        $tipo = array('E' => 'Entradas', 'S' => 'Saídas', 'R' => 'Retiradas');
+        $tipo = array('E' => 'Entradas', 'S' => 'Saídas');
         $this->set('tipo', $tipo);
 
         if ($this->request->is('post') || $this->request->is('put')) {
@@ -1647,8 +1647,7 @@ class CaixasController extends AppController {
 
         $result = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') as mesano,
                                               case when (categorias.tipo = ' . "'E'" . ') then ' . "'Entradas'" . '
-                                              else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . '
-                                              else case when (categorias.tipo = ' . "'R'" . ') then ' . "'Retiradas'" . ' end end end as tipo,
+                                              else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . ' end end as tipo,
                                               case when (categorias.tipo = ' . "'E'" . ') then ' . "'1'" . '
                                               else case when (categorias.tipo = ' . "'S'" . ') then ' . "'2'" . '
                                               else case when (categorias.tipo = ' . "'R'" . ') then ' . "'3'" . ' end end end as ordem,
@@ -1668,7 +1667,7 @@ class CaixasController extends AppController {
 
         //Relatório de movimentações - Linhas
 
-        $tipos = array('E' => 'Entradas', 'S' => 'Saidas', 'L' => 'Lucro', 'R' => 'Retiradas', 'D' => 'Saldo');
+        $tipos = array('E' => 'Entradas', 'S' => 'Saidas', 'L' => 'Lucro', 'D' => 'Saldo');
 
         $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
 
@@ -1710,8 +1709,7 @@ class CaixasController extends AppController {
 
             $result_aux = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') as mesano,
                                                       case when (categorias.tipo = ' . "'E'" . ') then ' . "'Entradas'" . '
-                                                      else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . '
-                                                      else case when (categorias.tipo = ' . "'R'" . ') then ' . "'Retiradas'" . ' end end end as tipo,
+                                                      else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . 'end end as tipo,
                                                       case when (categorias.tipo = ' . "'E'" . ') then ' . "'1'" . '
                                                       else case when (categorias.tipo = ' . "'S'" . ') then ' . "'2'" . '
                                                       else case when (categorias.tipo = ' . "'R'" . ') then ' . "'3'" . ' end end end as ordem,
@@ -1758,7 +1756,7 @@ class CaixasController extends AppController {
 
         //Relatório de movimentações - Barras
 
-        $tipos = array('E' => 'Entradas', 'S' => 'Saidas', 'L' => 'Lucro', 'R' => 'Retiradas', 'D' => 'Saldo');
+        $tipos = array('E' => 'Entradas', 'S' => 'Saidas', 'L' => 'Lucro', 'D' => 'Saldo');
 
         $columns_barras['data'] = array('type' => 'string', 'label' => 'Data');
 
@@ -1800,8 +1798,7 @@ class CaixasController extends AppController {
 
             $result_aux = $this->Caixa->query('select to_char(caixas.dtcaixa, ' . "'yyyy-mm'" . ') as mesano,
                                                       case when (categorias.tipo = ' . "'E'" . ') then ' . "'Entradas'" . '
-                                                      else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . '
-                                                      else case when (categorias.tipo = ' . "'R'" . ') then ' . "'Retiradas'" . ' end end end as tipo,
+                                                      else case when (categorias.tipo = ' . "'S'" . ') then ' . "'Saidas'" . 'end end as tipo,
                                                       case when (categorias.tipo = ' . "'E'" . ') then ' . "'1'" . '
                                                       else case when (categorias.tipo = ' . "'S'" . ') then ' . "'2'" . '
                                                       else case when (categorias.tipo = ' . "'R'" . ') then ' . "'3'" . ' end end end as ordem,
