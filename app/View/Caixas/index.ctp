@@ -1,5 +1,7 @@
 <?php
-echo $this->Html->link($this->Html->image("botoes/csv.png", array("alt" => "Exportar registros", "title" => "Exportar registros")), array('action' => 'exportar_csv'), array('escape' => false, 'target' => '_blank'));
+if ($adminholding == 1) {
+    echo $this->Html->link($this->Html->image("botoes/csv.png", array("alt" => "Exportar registros", "title" => "Exportar registros")), array('action' => 'exportar_csv'), array('escape' => false, 'target' => '_blank'));
+}
 echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "Imprimir", "title" => "Imprimir")), array('action' => 'imprimir_lista_caixas'), array('escape' => false, 'target' => '_blank'));
 echo $this->Html->link($this->Html->image("botoes/add.png", array("alt" => "Adicionar", "title" => "Adicionar")), array('action' => 'add'), array('escape' => false));
 ?>
