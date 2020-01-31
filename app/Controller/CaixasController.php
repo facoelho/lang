@@ -447,6 +447,8 @@ class CaixasController extends AppController {
      */
     public function indices() {
 
+        $this->set('title_for_layout', 'Indicador caixa');
+
         $dadosUser = $this->Session->read();
         $empresa_id = $dadosUser['empresa_id'];
         $this->set(compact('empresa_id'));
@@ -1607,6 +1609,8 @@ class CaixasController extends AppController {
      * movimentacaos method
      */
     public function movimentacaos() {
+
+        $this->set('title_for_layout', 'Movimentação caixa');
 
         $dadosUser = $this->Session->read();
         $empresa_id = $dadosUser['empresa_id'];

@@ -5,7 +5,6 @@
         echo $this->Html->charset();
         //Pegando dados da sessão do usuário
         $dadosUser = $this->Session->read();
-
         ?>
         <title>
             .:: Eduardo Lang <?php echo " - " . $title_for_layout . " - " . $dadosUser['nomeEmpresa'] . " "; ?> ::.
@@ -38,27 +37,27 @@
                 <?php
                 if ($dadosUser['empresa_tipologo'] == "R") {
                     ?>
-                <div id="topoleftr">
+                    <div id="topoleftr">
                         <?php
                         echo $this->Html->link($this->Html->image("empresas/" . $dadosUser['empresa_logo'], array("alt" => $dadosUser['nomeEmpresa'], "title" => $dadosUser['nomeEmpresa'])), array('controller' => 'homes', 'action' => 'index'), array('escape' => false));
                         ?>
-                </div>
+                    </div>
                     <?php
                 } elseif ($dadosUser['empresa_tipologo'] == "P") {
                     ?>
-                <div id="topoleftp">
+                    <div id="topoleftp">
                         <?php
                         echo $this->Html->link($this->Html->image("empresas/" . $dadosUser['empresa_logo'], array("alt" => $dadosUser['nomeEmpresa'], "title" => $dadosUser['nomeEmpresa'])), array('controller' => 'homes', 'action' => 'index'), array('escape' => false));
                         ?>
-                </div>
+                    </div>
                     <?php
                 } else {
                     ?>
-                <div id="topoleftr">
+                    <div id="topoleftr">
                         <?php
                         echo $this->Html->link($this->Html->image("marca.png", array("alt" => "Marca Cliente", "title" => "Marca Cliente")), array('controller' => 'homes', 'action' => 'index'), array('escape' => false));
                         ?>
-                </div>
+                    </div>
                     <?php
                 }
                 ?>
@@ -72,20 +71,20 @@
                         <br></br>
 
                         <?php if (count($dadosUser['empresasCombo']) > 1) { ?>
-<!-- <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href='http://www.sisagro.com/pecuaria/users/trocaEmpresa/' + this.value;"> -->
-                        <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href = 'http://localhost/agenda_express/users/trocaEmpresa/' + this.value;">
-                            <option value="">-- Trocar empresa -- </option>
-                            <?php for($i=0; $i < count($dadosUser['empresasCombo']); $i++) { ?>
-                            <option value="<?php echo $dadosUser['empresasCombo'][$i]['Empresa']['id']; ?>"><?php echo $dadosUser['empresasCombo'][$i]['Empresa']['nomefantasia']; ?></option>
-                            <?php } ?>
-                        </select>
+    <!-- <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href='http://www.sisagro.com/pecuaria/users/trocaEmpresa/' + this.value;"> -->
+                            <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href = 'http://localhost/agenda_express/users/trocaEmpresa/' + this.value;">
+                                <option value="">-- Trocar empresa -- </option>
+                                <?php for ($i = 0; $i < count($dadosUser['empresasCombo']); $i++) { ?>
+                                    <option value="<?php echo $dadosUser['empresasCombo'][$i]['Empresa']['id']; ?>"><?php echo $dadosUser['empresasCombo'][$i]['Empresa']['nomefantasia']; ?></option>
+                                <?php } ?>
+                            </select>
                         <?php } ?>
 
                         <?php
                         //echo $this->Html->link($this->Html->image("botoes/user_02.png", array("alt" => "Trocar empresa", "title" => "Trocar empresa")), array('controller' => 'users', 'action' => 'trocaEmpresa',14), array('escape' => false));
                         echo $this->Html->link($this->Html->image("botoes/logout_01.png", array("alt" => "Sair", "title" => "Sair")), array('controller' => 'users', 'action' => 'logout'), array('escape' => false));
 
-                        echo $this->Html->link($this->Html->image("botoes/email.jpg", array("alt" => "Mensagem cliente", "title" => "Mensagem cliente")), array('controller' => 'logs', 'action' => 'index'), array('escape' => false));
+//                        echo $this->Html->link($this->Html->image("botoes/email.jpg", array("alt" => "Mensagem cliente", "title" => "Mensagem cliente")), array('controller' => 'logs', 'action' => 'index'), array('escape' => false));
                         ?>
                     </div>
                 </div>
@@ -96,18 +95,18 @@
 
             <div id="conteudo">
                 <div id="titulopagina">
-                <?php echo $title_for_layout; ?>
+                    <?php echo $title_for_layout; ?>
                 </div>
                 <div id="corpo">
-                <?php echo $this->element('navegacao'); ?>
-                <?php echo $this->Session->flash(); ?>
-                <?php echo $this->fetch('content'); ?>
+                    <?php echo $this->element('navegacao'); ?>
+                    <?php echo $this->Session->flash(); ?>
+                    <?php echo $this->fetch('content'); ?>
                 </div>
 
             </div>
 
             <div id="rodape">
-            <?php echo $this->Js->writeBuffer(); ?>
+                <?php echo $this->Js->writeBuffer(); ?>
             </div>
 
         </div>

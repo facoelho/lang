@@ -10,7 +10,7 @@ App::import('Controller', 'Users');
 class DesempenhosController extends AppController {
 
     function beforeFilter() {
-
+        $this->set('title_for_layout', 'Desempenho');
     }
 
     /**

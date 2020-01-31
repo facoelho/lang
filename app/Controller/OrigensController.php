@@ -18,6 +18,8 @@ class OrigensController extends AppController {
      */
     public function index() {
 
+        $this->set('title_for_layout', 'Mídias de referência');
+
         $this->Origen->recursive = 0;
         $this->Paginator->settings = array(
             'order' => array('descricao' => 'asc')

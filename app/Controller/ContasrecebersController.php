@@ -18,6 +18,8 @@ class ContasrecebersController extends AppController {
      */
     public function index() {
 
+        $this->set('title_for_layout', 'Contas receber');
+
         $status = array('A' => 'ABERTO', 'F' => 'FECHADO');
 
         $this->Filter->addFilters(
@@ -91,9 +93,13 @@ class ContasrecebersController extends AppController {
     /**
      * relatorio_contas_receber method
      */
-    public function relatorio_contas_receber() {
+    public function relatorio_contas_receber($param = null) {
 
         $conditions_filtro = $this->Session->read('conditions_filtro');
+
+        if (!empty($param)) {
+            $conditions_filtro = 'Contasreceber.id = ' . $param;
+        }
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(

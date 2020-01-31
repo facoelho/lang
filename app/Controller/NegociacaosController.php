@@ -12,7 +12,7 @@ App::uses('GoogleCharts', 'GoogleCharts.Lib');
 class NegociacaosController extends AppController {
 
     function beforeFilter() {
-
+        $this->set('title_for_layout', 'Negociação');
     }
 
     /**
@@ -147,7 +147,7 @@ class NegociacaosController extends AppController {
 
         $corretors = $this->Corretor->find('list', array(
             'fields' => array('id', 'nome'),
-            'conditions' => array('gerencia' => 'N'),
+//            'conditions' => array('gerencia' => 'N'),
             'order' => array('nome' => 'asc')
         ));
         $this->set('corretors', $corretors);

@@ -81,6 +81,8 @@ class LeadsController extends AppController {
      */
     public function qualify() {
 
+        $this->set('title_for_layout', 'Qualificação leads');
+
         $this->loadModel('Origen');
         $origens = $this->Origen->find('list', array('fields' => array('id', 'descricao'),
             'order' => array('descricao')));
@@ -368,6 +370,8 @@ class LeadsController extends AppController {
      */
     public function leads_corretor() {
 
+        $this->set('title_for_layout', 'Leads/Corretor');
+
         $this->loadModel('Corretor');
         $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
             'conditions' => array('gerencia' => 'N'),
@@ -389,6 +393,16 @@ class LeadsController extends AppController {
         $this->set('grafico', $grafico);
 
         if ($this->request->is('post') || $this->request->is('put')) {
+
+            if ((empty($this->request->data['Relatorio']['dtinicio'])) or ( empty($this->request->data['Relatorio']['dtfim']))) {
+                $this->Session->setFlash('Período obrigatório.', 'default', array('class' => 'mensagem_erro'));
+                return;
+            }
+
+            $periodo['dtinicio'] = substr($this->request->data['Relatorio']['dtinicio'], 6, 4) . '-' . substr($this->request->data['Relatorio']['dtinicio'], 3, 2) . '-' . substr($this->request->data['Relatorio']['dtinicio'], 0, 2) . ' 00:00:00';
+            $periodo['dtfim'] = substr($this->request->data['Relatorio']['dtfim'], 6, 4) . '-' . substr($this->request->data['Relatorio']['dtfim'], 3, 2) . '-' . substr($this->request->data['Relatorio']['dtfim'], 0, 2) . ' 23:59:59';
+            CakeSession::write('periodo', $periodo);
+
             CakeSession::write('corretors', $this->request->data['Relatorio']['corretor']);
             CakeSession::write('origen_id', $this->request->data['Relatorio']['origen']);
             CakeSession::write('grafico', $this->request->data['Relatorio']['grafico']);
@@ -433,6 +447,7 @@ class LeadsController extends AppController {
         $cont = 0;
         $corretors = '';
         $origen_id = $this->Session->read('origen_id');
+        $periodo = $this->Session->read('periodo');
 
         $origen = $this->Lead->query('select descricao from origens where id = ' . $origen_id);
         $this->set('origen', $origen);
@@ -461,10 +476,11 @@ class LeadsController extends AppController {
                                              importacaoleads
                                        where corretors.id = leads.corretor_id
                                          and importacaoleads.id = leads.importacaolead_id
+                                         and importacaoleads.created between ' . "'" . $periodo['dtinicio'] . "'" . ' and ' . "'" . $periodo['dtfim'] . "'" . '
                                          and importacaoleads.origen_id in (' . $origen_id . ')
                                          and corretors.id in (' . $corretor[0]['id'] . ')
-                                       group by to_char(created, ' . "'dd/mm/yyyy'" . ')' . ', nome
-                                       order by nome, to_char(created, ' . "'dd/mm/yyyy'" . ') desc');
+                                       group by nome, created
+                                       order by nome, created asc');
 
             $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
             foreach ($result as $key => $item) :
@@ -516,6 +532,7 @@ class LeadsController extends AppController {
         $cont = 0;
         $corretors = '';
         $origen_id = $this->Session->read('origen_id');
+        $periodo = $this->Session->read('periodo');
 
         $origen = $this->Lead->query('select descricao from origens where id = ' . $origen_id);
         $this->set('origen', $origen);
@@ -544,10 +561,11 @@ class LeadsController extends AppController {
                                                 importacaoleads
                                           where corretors.id = leads.corretor_id
                                             and importacaoleads.id = leads.importacaolead_id
+                                            and importacaoleads.created between ' . "'" . $periodo['dtinicio'] . "'" . ' and ' . "'" . $periodo['dtfim'] . "'" . '
                                             and importacaoleads.origen_id in (' . $origen_id . ')
                                             and corretors.id in (' . $corretor[0]['id'] . ')
-                                          group by to_char(created, ' . "'dd/mm/yyyy'" . ')' . ', nome
-                                          order by nome, to_char(created, ' . "'dd/mm/yyyy'" . ') desc');
+                                          group by nome, created
+                                          order by nome, created');
 
             $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
             foreach ($result as $key => $item) :
@@ -724,6 +742,7 @@ class LeadsController extends AppController {
         $contador = 0;
         $corretors = '';
         $origen_id = $this->Session->read('origen_id');
+        $periodo = $this->Session->read('periodo');
 
         $origen = $this->Lead->query('select descricao from origens where id = ' . $origen_id);
         $this->set('origen', $origen);
@@ -759,6 +778,7 @@ class LeadsController extends AppController {
                                              importacaoleads
                                        where corretors.id = leads.corretor_id
                                          and importacaoleads.id = leads.importacaolead_id
+                                         and importacaoleads.created between ' . "'" . $periodo['dtinicio'] . "'" . ' and ' . "'" . $periodo['dtfim'] . "'" . '
                                          and importacaoleads.origen_id in (' . $origen_id . ')
                                         group by nome
                                         order by nome');
@@ -1016,6 +1036,8 @@ class LeadsController extends AppController {
      * leads_empreendimentos method
      */
     public function leads_empreendimentos() {
+
+        $this->set('title_for_layout', 'Leads/Empreendimento');
 
         $dadosUser = $this->Session->read();
 
@@ -1799,6 +1821,8 @@ class LeadsController extends AppController {
      * leads_corretor method
      */
     public function equipe() {
+
+        $this->set('title_for_layout', 'Equipe');
 
         $this->loadModel('Corretor');
         $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),

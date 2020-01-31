@@ -25,7 +25,7 @@ $saldo_final = 0;
             <?php if ($contasreceber_id <> $item['Contasreceber']['id']) { ?>
                 <td><?php echo h($item['Contasreceber']['id']); ?>&nbsp;</td>
                 <?php if ($item['Contasreceber']['status'] == 'A') { ?>
-                    <td><strong><font color="red"><?php echo 'Aberto'; ?>&nbsp;</font></strong></td>
+                    <td><strong><font color="blue"><?php echo 'Aberto'; ?>&nbsp;</font></strong></td>
                 <?php } else { ?>
                     <td><strong><font color="green"><?php echo 'Fechado'; ?>&nbsp;</font></strong></td>
                 <?php } ?>
@@ -55,6 +55,6 @@ $saldo_final = 0;
         <td><b><font color="green"><?php echo 'Valor recebido: ' . number_format($valor_recebido, 2, ',', '.'); ?>&nbsp;</b></td>
     </tr>
     <tr>
-        <td><b><font color="red"><?php echo 'Valor à receber: ' . number_format($saldo_final, 2, ',', '.'); ?>&nbsp;</b></td>
+        <td><b><font color="blue"><?php echo 'Valor à receber: ' . number_format($saldo_final, 2, ',', '.'); ?>&nbsp;</b></td>
     </tr>
 </table>

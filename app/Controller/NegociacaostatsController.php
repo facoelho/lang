@@ -38,6 +38,10 @@ class NegociacaostatsController extends AppController {
             $this->Negociacaostat->create();
 
             if ($this->Negociacaostat->save($this->request->data)) {
+
+                $this->Negociacaostat->Negociacao->id = $id;
+                $this->Negociacaostat->Negociacao->saveField('status', $this->request->data['Negociacaostat']['status']);
+
                 $this->Session->setFlash('Registro adicionado com sucesso!', 'default', array('class' => 'mensagem_sucesso'));
                 $this->redirect(array('controller' => 'Negociacaos', 'action' => 'index'));
             } else {

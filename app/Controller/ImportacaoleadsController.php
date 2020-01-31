@@ -10,7 +10,7 @@ App::import('Controller', 'Users');
 class ImportacaoleadsController extends AppController {
 
     function beforeFilter() {
-        $this->set('title_for_layout', 'Importacao leads');
+        $this->set('title_for_layout', 'Importação leads');
     }
 
     /**
