@@ -3,7 +3,7 @@
         <div id="contasreceber_home">
             <table border="1" style ="width:100%">
                 <tr>
-                    <th colspan="3"><h3><font color="blue"><center>Títulos a receber nos próximos 30 dias</center></font></h3></th>
+                    <th colspan="3"><h3><font color="blue"><center>Honorários a receber (30 dias)</center></font></h3></th>
                 </tr>
                 <tr>
                     <th>Vencimento</th>

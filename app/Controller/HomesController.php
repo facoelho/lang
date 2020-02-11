@@ -2,9 +2,11 @@
 
 class HomesController extends AppController {
 
-    public function index() {
-
+    function beforeFilter() {
         $this->set('title_for_layout', 'Home');
+    }
+
+    public function index() {
 
         $dadosUser = $this->Session->read();
 

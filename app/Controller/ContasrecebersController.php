@@ -103,7 +103,7 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
+            'fields' => array('Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
                 'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento'),
             'joins' => array(
                 array(

@@ -8,7 +8,10 @@ $cont = 1;
     <div id="contasreceber">
         <table border="1" style ="width:100%">
             <tr>
-                <th>Parcela</th>
+                <th colspan="4"><h3><font color="blue"><center>Honorários a receber</center></font></h3></th>
+            </tr>
+            <tr>
+                <th>Parcelas</th>
                 <th>Vencimento</th>
                 <th>Valor parcela</th>
                 <th>Pagamento</th>
