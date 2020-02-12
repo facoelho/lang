@@ -209,6 +209,11 @@ class ContasrecebersController extends AppController {
             $this->redirect(array('action' => 'index'));
         }
 
+        //contasreceber_id
+        $this->set('contasreceber_id', $id);
+        //negociacao_id
+        $this->set('negociacao_id', $negociacao_id);
+
         $this->Contasreceber->recursive = 0;
 
         $this->Paginator->settings = array(
@@ -241,6 +246,18 @@ class ContasrecebersController extends AppController {
 
                 $this->Contasreceber->begin();
 
+                foreach ($this->request->data['valorparcela'] as $key => $item) :
+                    $this->Contasreceber->query('update contasrecebermovs
+                                                    set valorparcela = ' . str_replace(',', '.', $this->request->data['valorparcela'][$key]) . '
+                                                  where id = ' . $key);
+                endforeach;
+
+                foreach ($this->request->data['dtvencimento'] as $key => $item) :
+                    $this->Contasreceber->query('update contasrecebermovs
+                                                    set dtvencimento = ' . "'" . substr($item, 6, 4) . '-' . substr($item, 3, 2) . '-' . substr($item, 0, 2) . "'" . '
+                                                  where id = ' . $key);
+                endforeach;
+
                 foreach ($this->request->data['dtpagamento'] as $key => $item) :
 
                     if (!empty($item)) {
@@ -250,8 +267,7 @@ class ContasrecebersController extends AppController {
                         //
 
                         $this->Contasreceber->query('update contasrecebermovs
-                                                        set dtpagamento  = ' . "'" . substr($item, 6, 4) . '-' . substr($item, 3, 2) . '-' . substr($item, 0, 2) . "'" . ',' . '
-                                                            valorparcela = ' . str_replace(',', '.', $this->request->data['valorparcela'][$key]) . '
+                                                        set dtpagamento  = ' . "'" . substr($item, 6, 4) . '-' . substr($item, 3, 2) . '-' . substr($item, 0, 2) . "'" . '
                                                       where id = ' . $key);
 
                         $result = $this->Contasreceber->query('select count(*) cont from caixas where dtcaixa = ' . "'" . substr($item, 6, 4) . '-' . substr($item, 3, 2) . '-' . substr($item, 0, 2) . "'");
@@ -306,6 +322,19 @@ class ContasrecebersController extends AppController {
                 $this->Contasreceber->rollback();
                 $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
+        }
+    }
+
+    public function add_parcela($contasreceber_id = null, $negociacao_id = null) {
+
+        $dadosUser = $this->Session->read();
+
+        if ($this->request->is('post') || $this->request->is('put')) {
+
+            $this->Contasreceber->query('insert into contasrecebermovs(contasreceber_id, valorparcela, user_id, created, dtvencimento)
+                                          values(' . $contasreceber_id . ',' . str_replace(',', '.', $this->request->data['Contasreceber']['valorparcela']) . ',' . $dadosUser['Auth']['User']['id'] . ',' . "'" . date('Y-m-d H:i') . "'" . ',' . "'" . substr($this->request->data['Contasreceber']['dtvencimento'], 6, 4) . '-' . substr($this->request->data['Contasreceber']['dtvencimento'], 3, 2) . '-' . substr($this->request->data['Contasreceber']['dtvencimento'], 0, 2) . "'" . ')');
+
+            $this->redirect(array('action' => 'pagar/' . $contasreceber_id . '/' . $negociacao_id));
         }
     }
 
