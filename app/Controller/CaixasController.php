@@ -265,15 +265,15 @@ class CaixasController extends AppController {
 //                return;
 //            }
 //
-//            $valida_caixa = $this->Caixa->find('list', array(
-//                'conditions' => array('empresa_id' => $empresa_id,
-//                    'dtcaixa >=' . "'" . substr($this->request->data['Caixa']['dtcaixa'], 6, 4) . "-" . substr($this->request->data['Caixa']['dtcaixa'], 3, 2) . "-" . substr($this->request->data['Caixa']['dtcaixa'], 0, 2) . "'",
-//            )));
-//
-//            if (!empty($valida_caixa)) {
-//                $this->Session->setFlash('Existe caixa aberto com data maior do que a informada!', 'default', array('class' => 'mensagem_erro'));
-//                return;
-//            }
+            $valida_caixa = $this->Caixa->find('list', array(
+                'conditions' => array('empresa_id' => $empresa_id,
+                    'dtcaixa =' . "'" . substr($this->request->data['Caixa']['dtcaixa'], 6, 4) . "-" . substr($this->request->data['Caixa']['dtcaixa'], 3, 2) . "-" . substr($this->request->data['Caixa']['dtcaixa'], 0, 2) . "'",
+            )));
+
+            if (!empty($valida_caixa)) {
+                $this->Session->setFlash('Caixa já foi aberto na data informada!', 'default', array('class' => 'mensagem_erro'));
+                return;
+            }
 
             $this->Caixa->create();
 

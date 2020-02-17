@@ -64,14 +64,17 @@
 
                 <div id="toporight">
                     <div id="internadomenu">
-                        <br></br>
+                        <br>
+                        <?php
+                        echo $this->Html->link($this->Html->image("botoes/logout_01.png", array("alt" => "Sair", "title" => "Sair")), array('controller' => 'users', 'action' => 'logout'), array('escape' => false));
+                        ?>
                         Bem vindo, <span class="fontNomeUsuario"><b><?php echo $dadosUser['Auth']['User']['nome']; ?></b></span>.
                         <br> <span class="fontUltimoAcesso">Seu último acesso foi: <?php echo date('d/m/Y', strtotime($dadosUser['Auth']['User']['ultimoacesso'])) . " | " . date('H:i', strtotime($dadosUser['Auth']['User']['ultimoacesso'])); ?></span>
                         <br> <span class="fontUltimoAcesso">Você está logado em: <b><?php echo $dadosUser['nomeEmpresa']; ?></b></span>
                         <br></br>
 
                         <?php if (count($dadosUser['empresasCombo']) > 1) { ?>
-        <!-- <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href='http://www.sisagro.com/pecuaria/users/trocaEmpresa/' + this.value;"> -->
+                    <!-- <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href='http://www.sisagro.com/pecuaria/users/trocaEmpresa/' + this.value;"> -->
                             <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href = 'http://localhost/agenda_express/users/trocaEmpresa/' + this.value;">
                                 <option value="">-- Trocar empresa -- </option>
                                 <?php for ($i = 0; $i < count($dadosUser['empresasCombo']); $i++) { ?>
@@ -82,8 +85,7 @@
 
                         <?php
                         //echo $this->Html->link($this->Html->image("botoes/user_02.png", array("alt" => "Trocar empresa", "title" => "Trocar empresa")), array('controller' => 'users', 'action' => 'trocaEmpresa',14), array('escape' => false));
-                        echo $this->Html->link($this->Html->image("botoes/logout_01.png", array("alt" => "Sair", "title" => "Sair")), array('controller' => 'users', 'action' => 'logout'), array('escape' => false));
-
+//                        echo $this->Html->link($this->Html->image("botoes/logout_01.png", array("alt" => "Sair", "title" => "Sair")), array('controller' => 'users', 'action' => 'logout'), array('escape' => false));
 //                        echo $this->Html->link($this->Html->image("botoes/email.jpg", array("alt" => "Mensagem cliente", "title" => "Mensagem cliente")), array('controller' => 'logs', 'action' => 'index'), array('escape' => false));
                         ?>
                     </div>
