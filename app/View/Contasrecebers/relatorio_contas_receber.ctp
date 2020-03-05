@@ -43,7 +43,11 @@ $saldo_final = 0;
             <?php } else { ?>
                 <td colspan="8"><?php echo ''; ?>&nbsp;</td>
             <?php } ?>
-            <td><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtvencimento'])); ?>&nbsp;</td>
+            <?php if (!empty($item['Contasrecebermov']['dtvencimento'])) { ?>
+                <td><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtvencimento'])); ?>&nbsp;</td>
+            <?php } else { ?>
+                <td><?php echo ''; ?>&nbsp;</td>
+            <?php } ?>
             <?php if (!empty($item['Contasrecebermov']['dtpagamento'])) { ?>
                 <td><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtpagamento'])); ?>&nbsp;</td>
                 <?php $valor_recebido = $valor_recebido + $item['Contasrecebermov']['valorparcela']; ?>

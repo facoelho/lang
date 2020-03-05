@@ -69,7 +69,6 @@ echo $this->Html->link($this->Html->image("botoes/graficos.png", array("alt" => 
             <?php } else { ?>
                 <td><?php echo ''; ?>&nbsp;</td>
             <?php } ?>
-
             <?php foreach ($item['Corretor'] as $key => $value) : ?>
                 <?php if (empty($corretors)) { ?>
                     <?php $corretors = $value['nome']; ?>

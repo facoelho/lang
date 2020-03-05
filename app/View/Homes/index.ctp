@@ -14,6 +14,8 @@
                     <tr>
                         <?php if (date('Y-m-d') > date('Y-m-d', strtotime($item[0]['dtvencimento']))) { ?>
                             <td><strong><font color="red"><?php echo date('d/m/Y', strtotime($item[0]['dtvencimento'])); ?></font></strong></td>
+                        <?php } elseif (date('Y-m-d') == date('Y-m-d', strtotime($item[0]['dtvencimento']))) { ?>
+                            <td><strong><font color="#d8b514"><?php echo date('d/m/Y', strtotime($item[0]['dtvencimento'])); ?></font></strong></td>
                         <?php } else { ?>
                             <td><strong><font color="green"><?php echo date('d/m/Y', strtotime($item[0]['dtvencimento'])); ?></font></strong></td>
                         <?php } ?>

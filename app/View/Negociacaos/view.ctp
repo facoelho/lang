@@ -49,6 +49,16 @@ $cont = 1;
     <strong> Comprador: </strong>
     <?php echo $negociacao['Negociacao']['cliente_comprador']; ?>
     <br>
+    <strong> Corretor: </strong>
+    <?php foreach ($negociacao['Corretor'] as $key => $value) : ?>
+        <?php if (empty($corretors)) { ?>
+            <?php $corretors = $value['nome']; ?>
+        <?php } else { ?>
+            <?php $corretors .= ', ' . $value['nome']; ?>
+        <?php } ?>
+    <?php endforeach; ?>
+    <?php echo $corretors; ?>
+    <br>
     <strong> Valor do imóvel: </strong>
     <?php echo number_format($negociacao['Negociacao']['valor_imovel'], 2, ',', '.'); ?>
     <br>
@@ -96,6 +106,8 @@ $cont = 1;
                 <b><?php echo 'ACEITA'; ?></b>
             <?php } elseif ($item['status'] == 'F') { ?>
                 <b><?php echo 'FINALIZADA'; ?></b>
+            <?php } elseif ($item['status'] == 'C') { ?>
+                <b><?php echo 'CANCELADO'; ?></b>
             <?php } ?>
             <?php echo ' | ' . date('d/m/Y', strtotime($item['created'])) . ' | ' . $usuario; ?>
             <br>

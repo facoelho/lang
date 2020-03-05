@@ -1681,7 +1681,7 @@ class CaixasController extends AppController {
 
         foreach ($tipos as $key => $item) :
             $columns_linha[$item] = array('type' => 'number', 'label' => $item);
-//            $columns_linha[] = array('type' => 'number', 'role' => 'annotation');
+            $columns_linha[] = array('type' => 'number', 'role' => 'annotation');
         endforeach;
 
         $column_chart_linha = new GoogleCharts();
@@ -1770,7 +1770,7 @@ class CaixasController extends AppController {
 
         foreach ($tipos as $key => $item) :
             $columns_barras[$item] = array('type' => 'number', 'label' => $item);
-//            $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+            $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
         endforeach;
 
         $column_chart_barras = new GoogleCharts();
