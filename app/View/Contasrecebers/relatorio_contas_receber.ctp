@@ -11,8 +11,9 @@ $saldo_final = 0;
 </div>
 <table cellpadding="0" cellspacing="0">
     <tr>
-        <th><?php echo 'C. receber'; ?></th>
+        <th><?php echo 'C.receber'; ?></th>
         <th><?php echo 'Negociação'; ?></th>
+        <th><?php echo 'Corretor'; ?></th>
         <th><?php echo 'Vendedor'; ?></th>
         <th><?php echo 'Comprador'; ?></th>
         <th><?php echo 'Status'; ?></th>
@@ -28,6 +29,7 @@ $saldo_final = 0;
             <?php if ($contasreceber_id <> $item['Contasreceber']['id']) { ?>
                 <td><?php echo h($item['Contasreceber']['id']); ?>&nbsp;</td>
                 <td><?php echo h($item['Negociacao']['id']); ?>&nbsp;</td>
+                <td><?php echo h($item['Corretor']['nome']); ?>&nbsp;</td>
                 <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
                 <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
                 <?php if ($item['Contasreceber']['status'] == 'A') { ?>
@@ -41,7 +43,7 @@ $saldo_final = 0;
                 <td><?php echo number_format($saldo, 2, ',', '.'); ?>&nbsp;</td>
                 <?php $saldo_final = $saldo_final + $saldo; ?>
             <?php } else { ?>
-                <td colspan="8"><?php echo ''; ?>&nbsp;</td>
+                <td colspan="9"><?php echo ''; ?>&nbsp;</td>
             <?php } ?>
             <?php if (!empty($item['Contasrecebermov']['dtvencimento'])) { ?>
                 <td><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtvencimento'])); ?>&nbsp;</td>

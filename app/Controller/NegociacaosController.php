@@ -147,7 +147,7 @@ class NegociacaosController extends AppController {
 
         $corretors = $this->Corretor->find('list', array(
             'fields' => array('id', 'nome'),
-//            'conditions' => array('gerencia' => 'N'),
+            'conditions' => array('ativo' => 'S'),
             'order' => array('nome' => 'asc')
         ));
         $this->set('corretors', $corretors);

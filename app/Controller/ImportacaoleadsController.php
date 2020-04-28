@@ -185,8 +185,8 @@ class ImportacaoleadsController extends AppController {
 
                     $cliente = $this->Importacaolead->query('select MAX(id) as id from public.clientes', false);
 
-                    $this->Importacaolead->query('INSERT INTO public.leads(cliente_id, status, importacaolead_id)
-                                              values(' . $cliente[0][0]['id'] . ',' . "'A'" . ',' . $importacaolead[0][0]['id'] . ')');
+                    $this->Importacaolead->query('INSERT INTO public.leads(cliente_id, status, importacaolead_id, obs_cliente)
+                                              values(' . $cliente[0][0]['id'] . ',' . "'A'" . ',' . $importacaolead[0][0]['id'] . ',' . "'" . $line[3] . "'" . ')');
                 }
 
                 $this->Importacaolead->commit();
@@ -252,7 +252,7 @@ class ImportacaoleadsController extends AppController {
         $this->Importacaolead->Lead->recursive = 0;
 
         $leads = $this->Importacaolead->Lead->find('all', array(
-            'fields' => array('Importacaolead.created', 'Lead.id', 'Origen.descricao', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone', 'Corretor.id', 'Corretor.nome'),
+            'fields' => array('Importacaolead.created', 'Lead.id', 'Origen.descricao', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone', 'Corretor.id', 'Corretor.nome', 'Lead.obs_cliente'),
             'conditions' => array('Importacaolead.id' => $id, 'Lead.corretor_id IS NOT NULL'),
             'joins' => array(
                 array(
@@ -282,7 +282,7 @@ class ImportacaoleadsController extends AppController {
         $this->Importacaolead->Lead->recursive = 0;
 
         $leads = $this->Importacaolead->Lead->find('all', array(
-            'fields' => array('Importacaolead.created', 'Lead.id', 'Origen.descricao', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone', 'Corretor.id', 'Corretor.nome', 'Origen.id', 'Origen.descricao'),
+            'fields' => array('Importacaolead.created', 'Lead.id', 'Lead.obs_cliente', 'Origen.descricao', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone', 'Corretor.id', 'Corretor.nome', 'Origen.id', 'Origen.descricao'),
             'joins' => array(
                 array(
                     'table' => 'origens',

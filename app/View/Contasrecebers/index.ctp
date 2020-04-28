@@ -6,24 +6,31 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
 <div id="filtroGrade">
     <?php
     echo $this->Search->create();
+    echo $this->Search->input('filter6', array('class' => 'input-box', 'placeholder' => 'Endereço'));
+    echo $this->Html->image("separador.png");
     echo $this->Search->input('filter1', array('class' => 'input-box', 'placeholder' => 'Referência'));
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter2', array('class' => 'input-box', 'placeholder' => 'Cliente vendedor'));
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter3', array('class' => 'input-box', 'placeholder' => 'Cliente comprador'));
     echo $this->Html->image("separador.png");
-    echo $this->Search->input('filter4', array('class' => 'input-box', 'id' => 'data1', 'placeholder' => 'Data Vencimento inicial', 'title' => 'Data inicial'), array('class' => 'input-box', 'id' => 'data2', 'placeholder' => 'Data Vencimento final', 'title' => 'Data final'));
+    echo $this->Search->input('filter4', array('class' => 'input-box', 'id' => 'data1', 'placeholder' => 'Vencimento inicial', 'title' => 'Data inicial'), array('class' => 'input-box', 'id' => 'data2', 'placeholder' => 'Vencimento final', 'title' => 'Data final'));
     echo $this->Html->image("separador.png");
-    echo $this->Search->input('filter5', array('id' => 'statusID', 'class' => 'select-box', 'placeholder' => 'Status', 'empty' => '-- Status --'));
+    echo $this->Search->input('filter7', array('class' => 'input-box', 'id' => 'datapagto', 'placeholder' => 'Pagamento inicial', 'title' => 'Data inicial'), array('class' => 'input-box', 'id' => 'datapagto2', 'placeholder' => 'Pagamento final', 'title' => 'Data final'));
+    echo $this->Html->image("separador.png");
+    echo $this->Search->input('filter5', array('id' => 'statusID', 'class' => 'select-box', 'placeholder' => 'Status'));
     echo $this->Html->image("separador.png");
     ?>
     <input type="submit" value="Filtrar" class="botaoFiltro"/>
 </div>
+<br>
 <table cellpadding="0" cellspacing="0">
     <tr>
-        <th><?php echo $this->Paginator->sort('id'); ?></th>
+        <th><?php echo $this->Paginator->sort('id', 'C.receber'); ?></th>
+        <th><?php echo $this->Paginator->sort('Negociacao.id', 'Negociação'); ?></th>
         <th><?php echo $this->Paginator->sort('Negociacao.cliente_vendedor', 'Vendedor'); ?></th>
         <th><?php echo $this->Paginator->sort('Negociacao.cliente_comprador', 'Comprador'); ?></th>
+        <th><?php echo $this->Paginator->sort('Negociacao.endereco', 'Endereço'); ?></th>
         <th><?php echo $this->Paginator->sort('parcelas', 'Nº parcelas'); ?></th>
         <th><?php echo $this->Paginator->sort('valor_total', 'Valor total'); ?></th>
         <th><?php echo $this->Paginator->sort('saldo', 'Saldo'); ?></th>
@@ -33,14 +40,16 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
     <?php foreach ($contasrecebers as $item): ?>
         <tr>
             <td><?php echo h($item['Contasreceber']['id']); ?>&nbsp;</td>
+            <td><?php echo h($item['Negociacao']['id']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
+            <td><?php echo h($item['Negociacao']['endereco'] . ' - ' . $item['Negociacao']['referencia']); ?>&nbsp;</td>
             <td><?php echo h($item['Contasreceber']['parcelas']); ?>&nbsp;</td>
             <td><?php echo number_format($item['Contasreceber']['valor_total'], 2, ',', '.'); ?>&nbsp;</td>
             <?php $saldo = $this->requestAction('/Contasrecebers/calcula_saldo', array('pass' => array($item['Contasreceber']['id']))); ?>
             <td><?php echo number_format($saldo, 2, ',', '.'); ?>&nbsp;</td>
             <?php if ($item['Contasreceber']['status'] == 'A') { ?>
-                <td><strong><font color="red"><?php echo 'Aberto'; ?>&nbsp;</font></strong></td>
+                <td><strong><font color="blue"><?php echo 'Aberto'; ?>&nbsp;</font></strong></td>
             <?php } else { ?>
                 <td><strong><font color="green"><?php echo 'Fechado'; ?>&nbsp;</font></strong></td>
             <?php } ?>
@@ -76,5 +85,7 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
     jQuery(document).ready(function() {
         $("#data1").mask("99/99/9999");
         $("#data2").mask("99/99/9999");
+        $("#datapagto").mask("99/99/9999");
+        $("#datapagto2").mask("99/99/9999");
     });
 </script>

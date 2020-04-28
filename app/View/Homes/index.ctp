@@ -1,5 +1,11 @@
 <?php if (!empty($contasrecebers)) { ?>
     <?php if ($adminholding == 1) { ?>
+        <?php $pie_chart->div('chart_div'); ?>
+        <div id="graficos">
+            <div id="chart_div">
+                <?php echo $this->GoogleCharts->createJsChart($pie_chart); ?>
+            </div>
+        </div>
         <div id="contasreceber_home">
             <table border="1" style ="width:100%">
                 <tr>

@@ -8,7 +8,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
     <?php
     echo $this->Form->input('nome');
     echo $this->Form->input('email');
-    echo $this->Form->input('gerente', array('id' => 'gerenteID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Gerente'));
+    echo $this->Form->input('gerencia', array('id' => 'gerenteID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Gerente'));
     ?>
     <div id="formGerente">
         <?php

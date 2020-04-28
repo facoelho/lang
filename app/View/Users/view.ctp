@@ -5,21 +5,21 @@ echo $this->Form->postLink($this->Html->image('botoes/excluir.png', array('alt' 
 <br>
 <br>
 <p>
-<strong> Nome: </strong>
-<?php echo $user['User']['nome'] . " " . $user['User']['sobrenome']; ?>
-<br>
-<strong> E-mail: </strong>
-<?php echo $user['User']['email']; ?>
-<br>
-<strong> Holding: </strong>
-<?php echo $user['Holding']['nome']; ?>
-<br>
-<strong> Último acesso: </strong>
-<?php echo date('d/m/Y H:i:s', strtotime($user['User']['ultimoacesso'])); ?>
-<br>
-<strong> Última modifiação: </strong>
-<?php echo date('d/m/Y', strtotime($user['User']['modified'])); ?>
-<br>
-<strong> Criação: </strong>
-<?php echo date('d/m/Y', strtotime($user['User']['created'])); ?>
+    <strong> Nome: </strong>
+    <?php echo $user['User']['nome'] . " " . $user['User']['sobrenome']; ?>
+    <br>
+    <strong> E-mail: </strong>
+    <?php echo $user['User']['username']; ?>
+    <br>
+    <strong> Holding: </strong>
+    <?php echo $user['Holding']['nome']; ?>
+    <br>
+    <strong> Último acesso: </strong>
+    <?php echo date('d/m/Y H:i:s', strtotime($user['User']['ultimoacesso'])); ?>
+    <br>
+    <strong> Última modifiação: </strong>
+    <?php echo date('d/m/Y', strtotime($user['User']['modified'])); ?>
+    <br>
+    <strong> Criação: </strong>
+    <?php echo date('d/m/Y', strtotime($user['User']['created'])); ?>
 </p>

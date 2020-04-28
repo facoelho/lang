@@ -69,19 +69,19 @@ class Corretor extends AppModel {
             'finderQuery' => '',
             'counterQuery' => ''
         ),
-        'Negociacaocorretor' => array(
-            'className' => 'Negociacaocorretor',
-            'foreignKey' => 'corretor_id',
-            'dependent' => true,
-            'conditions' => '',
-            'fields' => '',
-            'order' => '',
-            'limit' => '',
-            'offset' => '',
-            'exclusive' => true,
-            'finderQuery' => '',
-            'counterQuery' => ''
-        ),
+//        'Negociacaocorretor' => array(
+//            'className' => 'Negociacaocorretor',
+//            'foreignKey' => 'corretor_id',
+//            'dependent' => true,
+//            'conditions' => '',
+//            'fields' => '',
+//            'order' => '',
+//            'limit' => '',
+//            'offset' => '',
+//            'exclusive' => true,
+//            'finderQuery' => '',
+//            'counterQuery' => ''
+//        ),
     );
 
 }

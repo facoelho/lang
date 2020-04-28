@@ -15,6 +15,7 @@ $cont = 0;
         <th><?php echo 'Cliente'; ?></th>
         <th><?php echo 'E-mail'; ?></th>
         <th><?php echo 'Telefone'; ?></th>
+        <th><?php echo 'Observação'; ?></th>
     </tr>
     <?php foreach ($leads as $item): ?>
         <?php $cont++; ?>
@@ -35,6 +36,7 @@ $cont = 0;
             <td><?php echo $item['Cliente']['nome']; ?>&nbsp;</td>
             <td><?php echo $item['Cliente']['email']; ?>&nbsp;</td>
             <td><?php echo $item['Cliente']['telefone']; ?>&nbsp;</td>
+            <td><?php echo $item['Lead']['obs_cliente']; ?>&nbsp;</td>
             <?php $corretor_id = $item['Corretor']['id']; ?>
             <?php $origen_id = $item['Origen']['id']; ?>
         </tr>

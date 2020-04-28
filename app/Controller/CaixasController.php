@@ -57,7 +57,7 @@ class CaixasController extends AppController {
                 array(
                     'filter1' => array(
                         'Lancamento.descricao' => array(
-                            'operator' => 'LIKE',
+                            'operator' => 'ILIKE',
                             'value' => array(
                                 'before' => '%',
                                 'after' => '%'

@@ -28,7 +28,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
                         $("#categoriaID").html(data);
                     },
                     type: "post",
-                    url: "\/Categorias\/buscaCategorias\/Lancamento\/" + $("#categorias_paiID option:selected").val()
+                    url: "http://www.imobiliariaeduardolang.com.br/gestao\/Categorias\/buscaCategorias\/Lancamento\/" + $("#categorias_paiID option:selected").val()
                 });
             });
         } else {
@@ -40,7 +40,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
                         $("#categoriaID").html(data);
                     },
                     type: "post",
-                    url: "\/savess_cap\/Categorias\/buscaCategorias\/Lancamento\/" + $("#categorias_paiID option:selected").val()
+                    url: "\/lang\/Categorias\/buscaCategorias\/Lancamento\/" + $("#categorias_paiID option:selected").val()
                 });
             });
         }

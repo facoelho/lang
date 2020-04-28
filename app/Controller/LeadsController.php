@@ -27,7 +27,7 @@ class LeadsController extends AppController {
         $this->Lead->Importacaolead->recursive = 0;
 
         $leads = $this->Lead->find('all', array(
-            'fields' => array('Lead.id', 'Lead.corretor_id', 'Origen.descricao', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone', 'Corretor.nome'),
+            'fields' => array('Lead.id', 'Lead.corretor_id', 'Lead.obs_cliente', 'Origen.descricao', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone', 'Corretor.nome'),
             'conditions' => array('Importacaolead.id' => $id),
             'joins' => array(
                 array(
@@ -394,20 +394,20 @@ class LeadsController extends AppController {
 
         if ($this->request->is('post') || $this->request->is('put')) {
 
-            if ((empty($this->request->data['Relatorio']['dtinicio'])) or ( empty($this->request->data['Relatorio']['dtfim']))) {
-                $this->Session->setFlash('Período obrigatório.', 'default', array('class' => 'mensagem_erro'));
-                return;
-            }
-
-            $periodo['dtinicio'] = substr($this->request->data['Relatorio']['dtinicio'], 6, 4) . '-' . substr($this->request->data['Relatorio']['dtinicio'], 3, 2) . '-' . substr($this->request->data['Relatorio']['dtinicio'], 0, 2) . ' 00:00:00';
-            $periodo['dtfim'] = substr($this->request->data['Relatorio']['dtfim'], 6, 4) . '-' . substr($this->request->data['Relatorio']['dtfim'], 3, 2) . '-' . substr($this->request->data['Relatorio']['dtfim'], 0, 2) . ' 23:59:59';
-            CakeSession::write('periodo', $periodo);
-
             CakeSession::write('corretors', $this->request->data['Relatorio']['corretor']);
             CakeSession::write('origen_id', $this->request->data['Relatorio']['origen']);
             CakeSession::write('grafico', $this->request->data['Relatorio']['grafico']);
 
             if ($this->request->data['Relatorio']['tipo'] == 'DL') {
+
+                if ((empty($this->request->data['Relatorio']['dtinicio'])) or ( empty($this->request->data['Relatorio']['dtfim']))) {
+                    $this->Session->setFlash('Período obrigatório.', 'default', array('class' => 'mensagem_erro'));
+                    return;
+                }
+                $periodo['dtinicio'] = substr($this->request->data['Relatorio']['dtinicio'], 6, 4) . '-' . substr($this->request->data['Relatorio']['dtinicio'], 3, 2) . '-' . substr($this->request->data['Relatorio']['dtinicio'], 0, 2) . ' 00:00:00';
+                $periodo['dtfim'] = substr($this->request->data['Relatorio']['dtfim'], 6, 4) . '-' . substr($this->request->data['Relatorio']['dtfim'], 3, 2) . '-' . substr($this->request->data['Relatorio']['dtfim'], 0, 2) . ' 23:59:59';
+                CakeSession::write('periodo', $periodo);
+
                 if ($this->request->data['Relatorio']['grafico'] == 'L') {
                     $this->redirect(array('action' => 'leads_corretor_linhas'));
                 } elseif ($this->request->data['Relatorio']['grafico'] == 'P') {
@@ -1818,7 +1818,7 @@ class LeadsController extends AppController {
     }
 
     /**
-     * leads_corretor method
+     * equipe method
      */
     public function equipe() {
 

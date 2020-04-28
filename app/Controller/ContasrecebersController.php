@@ -20,10 +20,21 @@ class ContasrecebersController extends AppController {
 
         $this->set('title_for_layout', 'Contas receber');
 
+        $filter_status = '';
+
         $status = array('A' => 'ABERTO', 'F' => 'FECHADO');
 
         $this->Filter->addFilters(
                 array(
+                    'filter6' => array(
+                        'Negociacao.endereco' => array(
+                            'operator' => 'ILIKE',
+                            'value' => array(
+                                'before' => '%',
+                                'after' => '%'
+                            )
+                        )
+                    ),
                     'filter1' => array(
                         'Negociacao.referencia' => array(
                             'operator' => 'ILIKE',
@@ -60,6 +71,15 @@ class ContasrecebersController extends AppController {
                             )
                         )
                     ),
+                    'filter7' => array(
+                        'Contasrecebermov.dtpagamento' => array(
+                            'operator' => 'BETWEEN',
+                            'between' => array(
+                                'text' => __(' e ', true),
+                                'date' => true
+                            )
+                        )
+                    ),
                     'filter5' => array(
                         'Contasreceber.status' => array(
                             'select' => $status
@@ -70,7 +90,7 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Contasreceber.id', 'Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'User.nome', 'User.sobrenome'),
+            'fields' => array('DISTINCT Contasreceber.id', 'Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'User.nome', 'User.sobrenome'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -83,7 +103,17 @@ class ContasrecebersController extends AppController {
             'order' => array('Contasreceber.id' => 'asc')
         );
 
-        $this->Filter->setPaginate('conditions', array($this->Filter->getConditions()));
+        foreach ($this->Filter->getConditions() as $key => $item) :
+            if ($key == 'Contasreceber.status =') {
+                $filter_status = 1;
+            }
+        endforeach;
+
+        if (empty($filter_status)) {
+            $conditions[] = 'Contasreceber.status NOT IN (' . "'F'" . ')';
+        }
+
+        $this->Filter->setPaginate('conditions', array($this->Filter->getConditions(), $conditions));
 
         $this->set('contasrecebers', $this->paginate());
 
@@ -104,13 +134,25 @@ class ContasrecebersController extends AppController {
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
             'fields' => array('Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento'),
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.nome'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
                     'alias' => 'Contasrecebermov',
                     'type' => 'LEFT',
                     'conditions' => array('Contasreceber.id = Contasrecebermov.contasreceber_id')
+                ),
+                array(
+                    'table' => 'negociacaocorretors',
+                    'alias' => 'Negociacaocorretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.negociacao_id = Negociacao.id')
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
                 ),
             ),
             'conditions' => $conditions_filtro,
@@ -119,6 +161,8 @@ class ContasrecebersController extends AppController {
         );
 
         $this->set('contasrecebers', $this->paginate());
+
+        debug($this->paginate());
     }
 
     /**

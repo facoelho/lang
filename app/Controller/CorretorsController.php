@@ -125,6 +125,8 @@ class CorretorsController extends AppController {
             $this->redirect(array('action' => 'index'));
         }
 
+        $this->Corretor->recursive = 0;
+
         if ($this->Corretor->delete()) {
             $this->Session->setFlash('Corretor deletado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
             $this->redirect(array('action' => 'index'));

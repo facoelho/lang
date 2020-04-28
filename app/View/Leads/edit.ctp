@@ -11,6 +11,7 @@ $cont = 0;
             <th><?php echo 'Cliente'; ?></th>
             <th><?php echo 'E-mail'; ?></th>
             <th><?php echo 'Telefone'; ?></th>
+            <th><?php echo 'Observação'; ?></th>
             <th><?php echo 'Corretor'; ?></th>
         </tr>
         <?php foreach ($leads as $item): ?>
@@ -19,6 +20,7 @@ $cont = 0;
                 <td><?php echo h($item['Cliente']['nome']); ?>&nbsp;</td>
                 <td><?php echo h($item['Cliente']['email']); ?>&nbsp;</td>
                 <td><?php echo h($item['Cliente']['telefone']); ?>&nbsp;</td>
+                <td><?php echo $item['Lead']['obs_cliente']; ?>&nbsp;</td>
                 <td><?php echo $this->Form->input('corretor_id.' . $item['Lead']['id'], array('id' => 'corretorID', 'type' => 'select', 'options' => $corretors, 'value' => $item['Lead']['corretor_id'], 'label' => false, 'empty' => '-- Selecione o corretor--')); ?>&nbsp;</td>
                 <?php $cont = $this->requestAction('/Leads/valida_vinculo_lead', array('pass' => array($item['Cliente']['email']))); ?>
                 <?php if ($cont > 1) { ?>

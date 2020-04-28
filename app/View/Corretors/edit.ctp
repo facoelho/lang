@@ -9,9 +9,9 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
     echo $this->Form->input('nome', array('label' => 'Nome', 'type' => 'text'));
     echo $this->Form->input('email', array('label' => 'E-mail', 'type' => 'text'));
     if ($this->request->data['Corretor']['gerencia'] == 'S') {
-        echo $this->Form->input('gerente', array('id' => 'gerenteID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Gerente', 'value' => 'S'));
+        echo $this->Form->input('gerencia', array('id' => 'gerenteID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Gerente', 'value' => 'S'));
     } else {
-        echo $this->Form->input('gerente', array('id' => 'gerenteID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Gerente', 'value' => 'N'));
+        echo $this->Form->input('gerencia', array('id' => 'gerenteID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Gerente', 'value' => 'N'));
     }
     ?>
     <div id="formGerente">
