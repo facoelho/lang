@@ -7,6 +7,8 @@ echo $this->Html->link($this->Html->image("botoes/graficos.png", array("alt" => 
 <div id="filtroGrade">
     <?php
     echo $this->Search->create();
+    echo $this->Search->input('filter7', array('class' => 'input-box', 'placeholder' => 'Código'));
+    echo $this->Html->image("separador.png");
     echo $this->Search->input('filter6', array('id' => 'corretorID', 'class' => 'select-box', 'placeholder' => 'Corretores', 'empty' => '-- Corretores --'));
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter1', array('class' => 'input-box', 'placeholder' => 'Referência'));

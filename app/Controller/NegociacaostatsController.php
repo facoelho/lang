@@ -20,7 +20,14 @@ class NegociacaostatsController extends AppController {
 
         $dadosUser = $this->Session->read();
 
-        $status = array('E' => 'EM ANDAMENTO', 'A' => 'ACEITA', 'F' => 'FINALIZADO', 'C' => 'CANCELADO');
+        $contasreceber = $this->Negociacaostat->query('select count(*) as cont from contasrecebers where negociacao_id = ' . $id);
+
+        if ($contasreceber[0][0]['cont'] > 0) {
+            $status = array('E' => 'EM ANDAMENTO', 'A' => 'ACEITA', 'F' => 'FINALIZADO');
+        } else {
+            $status = array('E' => 'EM ANDAMENTO', 'A' => 'ACEITA', 'F' => 'FINALIZADO', 'C' => 'CANCELADO');
+        }
+
         $this->set('status', $status);
 
         $this->Negociacaostat->Negociacao->recursive = 0;

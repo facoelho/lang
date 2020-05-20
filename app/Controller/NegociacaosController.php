@@ -38,6 +38,11 @@ class NegociacaosController extends AppController {
 
         $this->Filter->addFilters(
                 array(
+                    'filter7' => array(
+                        'Negociacao.id' => array(
+                            'operator' => '=',
+                        )
+                    ),
                     'filter6' => array(
                         'Negociacaocorretor.corretor_id' => array(
                             'select' => $corretors

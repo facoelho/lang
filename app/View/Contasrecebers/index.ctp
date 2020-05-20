@@ -6,13 +6,13 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
 <div id="filtroGrade">
     <?php
     echo $this->Search->create();
-    echo $this->Search->input('filter6', array('class' => 'input-box', 'placeholder' => 'Endereço'));
-    echo $this->Html->image("separador.png");
     echo $this->Search->input('filter1', array('class' => 'input-box', 'placeholder' => 'Referência'));
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter2', array('class' => 'input-box', 'placeholder' => 'Cliente vendedor'));
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter3', array('class' => 'input-box', 'placeholder' => 'Cliente comprador'));
+    echo $this->Html->image("separador.png");
+    echo $this->Search->input('filter6', array('class' => 'input-box', 'placeholder' => 'Endereço'));
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter4', array('class' => 'input-box', 'id' => 'data1', 'placeholder' => 'Vencimento inicial', 'title' => 'Data inicial'), array('class' => 'input-box', 'id' => 'data2', 'placeholder' => 'Vencimento final', 'title' => 'Data final'));
     echo $this->Html->image("separador.png");

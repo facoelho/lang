@@ -158,10 +158,17 @@ class LeadsController extends AppController {
             'order' => array('descricao')));
         $this->set('imoveltipos', $imoveltipos);
 
+        $this->loadModel('Bairro');
+        $bairros = $this->Bairro->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('bairros', $bairros);
+
+        debug($bairros);
+
         $this->Lead->recursive = 0;
         $this->Paginator->settings = array(
             'fields' => array('Lead.id', 'Origen.descricao', 'Corretor.id', 'Corretor.nome', 'Cliente.id', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone',
-                'Lead.sem_contato', 'Lead.ficha', 'Lead.compra', 'Lead.preco', 'Lead.localizacao', 'Lead.imoveltipo_id', 'Lead.obs', 'Lead.fone',
+                'Lead.sem_contato', 'Lead.ficha', 'Lead.compra', 'Lead.preco', 'Lead.localizacao', 'Lead.bairro_preferencial_id', 'Lead.imoveltipo_id', 'Lead.obs', 'Lead.fone',
                 'Lead.email', 'Lead.whats', 'Lead.material_enviado', 'Lead.sem_interesse', 'Lead.fone_tentativas', 'Lead.sem_atendimento', 'Lead.dt_alteracao', 'Importacaolead.created'),
             'joins' => array(
                 array(
@@ -256,6 +263,7 @@ class LeadsController extends AppController {
                 } else {
                     $this->Lead->saveField('localizacao', 'N');
                 }
+                $this->Lead->saveField('bairro_preferencial_id', $this->request->data['bairro_preferencial_id'][$key]);
                 $this->Lead->saveField('imoveltipo_id', $this->request->data['imoveltipo_id'][$key]);
                 $this->Lead->saveField('obs', $this->request->data['obs'][$key]);
             endforeach;

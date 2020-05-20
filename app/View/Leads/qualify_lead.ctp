@@ -66,9 +66,9 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
                 <td align="center"><?php echo $this->Form->input('preco.' . $item['Lead']['id'], array('id' => 'precoID', 'type' => 'checkbox', 'label' => 'Preço', 'checked' => false)); ?></td>
             <?php } ?>
             <?php if ($item['Lead']['localizacao'] == 'S') { ?>
-                <td align="center"><?php echo $this->Form->input('localizacao.' . $item['Lead']['id'], array('id' => 'localizacaoID', 'type' => 'checkbox', 'label' => 'Localiz', 'checked' => true)); ?></td>
+                <td align="center"><?php echo $this->Form->input('localizacao.' . $item['Lead']['id'], array('id' => 'localizacaoID', 'type' => 'checkbox', 'label' => 'Localiz', 'checked' => true)) . '</br>' . $this->Form->input('bairro_preferencial_id.' . $item['Lead']['id'], array('id' => 'bairroID', 'options' => $bairros, 'type' => 'select', 'label' => false, 'value' => $item['Lead']['bairro_preferencial_id'], 'empty' => '-- Bairro preferencial --', 'style' => 'width: 80px;font-size:12px')); ?></td>
             <?php } else { ?>
-                <td align="center"><?php echo $this->Form->input('localizacao.' . $item['Lead']['id'], array('id' => 'localizacaoID', 'type' => 'checkbox', 'label' => 'Localiz', 'checked' => false)); ?></td>
+                <td align="center"><?php echo $this->Form->input('localizacao.' . $item['Lead']['id'], array('id' => 'localizacaoID', 'type' => 'checkbox', 'label' => 'Localiz', 'checked' => false)) . '</br>' . $this->Form->input('bairro_preferencial_id.' . $item['Lead']['id'], array('id' => 'bairroID', 'options' => $bairros, 'type' => 'select', 'label' => false, 'value' => $item['Lead']['bairro_preferencial_id'], 'empty' => '-- Bairro preferencial --', 'style' => 'width: 80px;font-size:12px')); ?></td>
             <?php } ?>
             <td><?php echo $this->Form->input('imoveltipo_id.' . $item['Lead']['id'], array('id' => 'imoveltipoID', 'options' => $imoveltipos, 'type' => 'select', 'label' => false, 'value' => $item['Lead']['imoveltipo_id'], 'empty' => '-- Tipo de imóvel --', 'style' => 'width: 80px;font-size:12px')); ?></td>
             <?php if ($item['Lead']['compra'] == 'S') { ?>

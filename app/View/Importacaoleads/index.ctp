@@ -36,12 +36,21 @@ echo $this->Html->link($this->Html->image("botoes/add.png", array("alt" => "Adic
             <td><?php echo $item['Origen']['descricao']; ?>&nbsp;</td>
             <td><?php echo date('d/m/Y H:i:s', strtotime($item['Importacaolead']['created'])); ?>&nbsp;</td>
             <td><?php echo $item['User']['nome'] . ' ' . $item['User']['sobrenome']; ?>&nbsp;</td>
-            <?php $cont = $this->requestAction('/Importacaoleads/valida_corretor_leads', array('pass' => array($item['Importacaolead']['id']))); ?>
+            <?php
+            $cont = $this->requestAction('/Importacaoleads/valida_corretor_leads', array('pass' => array($item['Importacaolead']['id'])));
+            $email = $this->requestAction('/Importacaoleads/valida_email_enviado', array('pass' => array($item['Importacaolead']['id'])));
+            ?>
             <td>
                 <div id="botoes">
                     <?php
                     if ($cont > 0) {
                         echo $this->Html->image("botoes/alerta_min.png", array("alt" => "Lead(s) pendente(s) de vinculo com corretor", "title" => "Lead(s) pendente(s) vinculo com de corretor"));
+                    } else {
+                        if ($email == 'N') {
+                            echo $this->Html->link($this->Html->image('botoes/email_min_vermelho.png', array('alt' => 'Enviar lead(s) por e-mail?', 'title' => 'Enviar lead(s) por e-mail?')), array('action' => 'enviar_lead_email', $item['Importacaolead']['id']), array('escape' => false), __('Você realmete deseja enviar lead(s) por e-mail?'));
+                        } else {
+                            echo $this->Html->image("botoes/email_min_azul.png", array("alt" => "Lead(s) enviado(s) por e-mail", "title" => "Lead(s) enviado(s) por e-mail"));
+                        }
                     }
                     echo $this->Html->link($this->Html->image("botoes/printer_min.png", array("alt" => "Imprimir leads", "title" => "Imprimir leads")), array('action' => 'relatorio_leads', $item['Importacaolead']['id']), array('escape' => false, 'target' => '_blank'));
                     echo $this->Html->link($this->Html->image("botoes/editar_min.png", array("alt" => "Editar", "title" => "Editar")), array('controller' => 'Leads', 'action' => 'edit', $item['Importacaolead']['id']), array('escape' => false));

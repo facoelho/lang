@@ -26,15 +26,6 @@ class ContasrecebersController extends AppController {
 
         $this->Filter->addFilters(
                 array(
-                    'filter6' => array(
-                        'Negociacao.endereco' => array(
-                            'operator' => 'ILIKE',
-                            'value' => array(
-                                'before' => '%',
-                                'after' => '%'
-                            )
-                        )
-                    ),
                     'filter1' => array(
                         'Negociacao.referencia' => array(
                             'operator' => 'ILIKE',
@@ -55,6 +46,15 @@ class ContasrecebersController extends AppController {
                     ),
                     'filter3' => array(
                         'Negociacao.cliente_comprador' => array(
+                            'operator' => 'ILIKE',
+                            'value' => array(
+                                'before' => '%',
+                                'after' => '%'
+                            )
+                        )
+                    ),
+                    'filter6' => array(
+                        'Negociacao.endereco' => array(
                             'operator' => 'ILIKE',
                             'value' => array(
                                 'before' => '%',
@@ -236,7 +236,7 @@ class ContasrecebersController extends AppController {
         }
 
         if ($this->Contasreceber->delete()) {
-            $this->Session->setFlash('Mídia de referência deletada com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
+            $this->Session->setFlash('Contas a receber deletada com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
             $this->redirect(array('action' => 'index'));
         }
         $this->Session->setFlash('Registro não foi deletado.', 'default', array('class' => 'mensagem_erro'));

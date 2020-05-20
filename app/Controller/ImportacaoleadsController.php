@@ -4,10 +4,14 @@ App::uses('AppController', 'Controller');
 
 App::import('Controller', 'Users');
 
+App::uses('CakeEmail', 'Network/Email');
+
 /**
  * Importacaoleads Controller
  */
 class ImportacaoleadsController extends AppController {
+
+    var $components = array('Email');
 
     function beforeFilter() {
         $this->set('title_for_layout', 'Importação leads');
@@ -339,6 +343,54 @@ class ImportacaoleadsController extends AppController {
         $result = $this->Importacaolead->query('select count(*) as cont from public.leads where corretor_id is null and importacaolead_id = ' . $id);
 
         return $result[0][0]['cont'];
+    }
+
+    /**
+     * valida_corretor_lead method
+     */
+    public function valida_email_enviado($id = null) {
+
+        $result = $this->Importacaolead->query('select email_enviado from public.importacaoleads where id = ' . $id);
+
+        return $result[0][0]['email_enviado'];
+    }
+
+    /**
+     * enviar_email method
+     */
+    public function enviar_lead_email($id = null) {
+
+        $result = $this->Importacaolead->query('select corretors.id, corretors.nome,
+                                                       corretors.email as emailcorretor, clientes.nome,
+                                                       clientes.email as emailcliente, clientes.telefone,
+                                                       leads.obs_cliente
+                                                  from clientes, leads, corretors
+                                                 where clientes.id = leads.cliente_id
+                                                   and corretors.id = leads.corretor_id
+                                                   and leads.importacaolead_id = ' . $id . '
+                                                 order by corretors.id');
+
+        foreach ($result as $key => $item) :
+
+            $Email = new CakeEmail();
+
+            $Email->to($item[0]['emailcorretor']);
+            $Email->subject('Eduardo Lang | Leads');
+            $Email->from('contato@eduardolang.com.br');
+
+            $mensagem = 'Nome: ' . $item[0]['nome'] . '
+                         Telefone: ' . $item[0]['telefone'] . '
+                            E-mail: ' . $item[0]['emailcliente'] . '
+                            Mensagem: ' . $item[0]['obs_cliente'];
+
+            $Email->send($mensagem);
+
+        endforeach;
+
+        $this->Importacaolead->query('update importacaoleads set email_enviado = ' . "'S'" . ' where id = ' . $id);
+
+        $this->Session->setFlash('Email enviado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
+        $this->redirect(array('action' => 'index'));
     }
 
 }
