@@ -16,7 +16,7 @@ class LeadsController extends AppController {
     var $components = array('Email');
 
     function beforeFilter() {
-
+        $this->Auth->allow('qualify_lead_corretor');
     }
 
     /**
@@ -163,8 +163,6 @@ class LeadsController extends AppController {
             'order' => array('nome')));
         $this->set('bairros', $bairros);
 
-        debug($bairros);
-
         $this->Lead->recursive = 0;
         $this->Paginator->settings = array(
             'fields' => array('Lead.id', 'Origen.descricao', 'Corretor.id', 'Corretor.nome', 'Cliente.id', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone',
@@ -181,7 +179,7 @@ class LeadsController extends AppController {
                 ),
             ),
             'conditions' => $conditions,
-            'order' => array('Cliente.nome' => 'asc'),
+            'order' => array('Lead.id' => 'desc'),
             'limit' => '',
         );
 
@@ -303,7 +301,174 @@ class LeadsController extends AppController {
     }
 
     /**
-     * qualify_lead method
+     * qualify_lead_corretor method
+     */
+    public function qualify_lead_corretor($id) {
+
+        $this->set('id', $id);
+
+        $dadosUser = $this->Session->read();
+
+        $alteracao = '';
+
+        $envia_email = 0;
+
+        $conditions_aux = $this->Session->read('conditions');
+
+        $conditions[] = array('Lead.id' => $id);
+
+        if (!empty($conditions_aux['sem_atendimento'])) {
+            if ($conditions_aux['sem_atendimento'] == 'S') {
+                $conditions['sem_atendimento'] = 'S';
+            } else {
+                $conditions['sem_atendimento'] = 'N';
+            }
+        }
+
+        if (!empty($conditions_aux['sem_contato'])) {
+            if ($conditions_aux['sem_contato'] == 'S') {
+                $conditions['sem_contato'] = 'S';
+            } else {
+                $conditions['sem_contato'] = 'N';
+            }
+        }
+
+        if (!empty($conditions_aux['ficha'])) {
+            if ($conditions_aux['ficha'] == 'S') {
+                $conditions['ficha'] = 'S';
+            } else {
+                $conditions['ficha'] = 'N';
+            }
+        }
+
+        if (!empty($conditions_aux['sem_interesse'])) {
+            if ($conditions_aux['sem_interesse'] == 'S') {
+                $conditions['sem_interesse'] = 'S';
+            } else {
+                $conditions['sem_interesse'] = 'N';
+            }
+        }
+
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'conditions' => array('gerencia' => 'N'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
+
+        $temperatura = array('F' => 'Frio', 'M' => 'Morno', 'Q' => 'Quente');
+        $this->set('temperatura', $temperatura);
+
+        $this->loadModel('Imoveltipo');
+        $imoveltipos = $this->Imoveltipo->find('list', array('fields' => array('id', 'descricao'),
+            'order' => array('descricao')));
+        $this->set('imoveltipos', $imoveltipos);
+
+        $this->loadModel('Bairro');
+        $bairros = $this->Bairro->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('bairros', $bairros);
+
+        $this->Lead->recursive = 0;
+
+        $this->Paginator->settings = array(
+            'fields' => array('Lead.id', 'Origen.descricao', 'Corretor.id', 'Corretor.nome', 'Cliente.id', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone',
+                'Lead.sem_contato', 'Lead.ficha', 'Lead.compra', 'Lead.preco', 'Lead.localizacao', 'Lead.bairro_preferencial_id', 'Lead.imoveltipo_id', 'Lead.obs', 'Lead.fone',
+                'Lead.email', 'Lead.whats', 'Lead.material_enviado', 'Lead.sem_interesse', 'Lead.fone_tentativas', 'Lead.sem_atendimento', 'Lead.dt_alteracao', 'Importacaolead.created'),
+            'joins' => array(
+                array(
+                    'table' => 'origens',
+                    'alias' => 'Origen',
+                    'type' => 'INNER',
+                    'conditions' => [
+                        'Importacaolead.origen_id = Origen.id',
+                    ],
+                ),
+            ),
+            'conditions' => $conditions,
+            'order' => array('Lead.id' => 'desc'),
+            'limit' => '',
+        );
+
+        $this->set('leads', $this->Paginator->paginate('Lead'));
+
+        if ($this->request->is('post') || $this->request->is('put')) {
+            foreach ($this->request->data['id'] as $key => $value) :
+                $this->Lead->id = $key;
+
+                $this->Lead->saveField('dt_alteracao', date('Y-m-d'));
+
+                if ($this->request->data['fone'][$key] > 0) {
+                    $this->Lead->saveField('fone', 'S');
+                } else {
+                    $this->Lead->saveField('fone', 'N');
+                }
+                if ($this->request->data['fone_tentativas'][$key] > 0) {
+                    $this->Lead->saveField('fone_tentativas', $this->request->data['fone_tentativas'][$key]);
+                } else {
+                    $this->Lead->saveField('fone_tentativas', '');
+                }
+                if ($this->request->data['whats'][$key] > 0) {
+                    $this->Lead->saveField('whats', 'S');
+                } else {
+                    $this->Lead->saveField('whats', 'N');
+                }
+                if ($this->request->data['email'][$key] > 0) {
+                    $this->Lead->saveField('email', 'S');
+                } else {
+                    $this->Lead->saveField('email', 'N');
+                }
+                if ($this->request->data['sem_atendimento'][$key] > 0) {
+                    $this->Lead->saveField('sem_atendimento', 'S');
+                } else {
+                    $this->Lead->saveField('sem_atendimento', 'N');
+                }
+                if ($this->request->data['sem_contato'][$key] > 0) {
+                    $this->Lead->saveField('sem_contato', 'S');
+                } else {
+                    $this->Lead->saveField('sem_contato', 'N');
+                }
+                if ($this->request->data['material_enviado'][$key] > 0) {
+                    $this->Lead->saveField('material_enviado', 'S');
+                } else {
+                    $this->Lead->saveField('material_enviado', 'N');
+                }
+                if ($this->request->data['sem_interesse'][$key] > 0) {
+                    $this->Lead->saveField('sem_interesse', 'S');
+                } else {
+                    $this->Lead->saveField('sem_interesse', 'N');
+                }
+                if ($this->request->data['ficha'][$key] > 0) {
+                    $this->Lead->saveField('ficha', 'S');
+                } else {
+                    $this->Lead->saveField('ficha', 'N');
+                }
+                if ($this->request->data['compra'][$key] > 0) {
+                    $this->Lead->saveField('compra', 'S');
+                } else {
+                    $this->Lead->saveField('compra', 'N');
+                }
+                if ($this->request->data['preco'][$key] > 0) {
+                    $this->Lead->saveField('preco', 'S');
+                } else {
+                    $this->Lead->saveField('preco', 'N');
+                }
+                if ($this->request->data['localizacao'][$key] > 0) {
+                    $this->Lead->saveField('localizacao', 'S');
+                } else {
+                    $this->Lead->saveField('localizacao', 'N');
+                }
+                $this->Lead->saveField('bairro_preferencial_id', $this->request->data['bairro_preferencial_id'][$key]);
+                $this->Lead->saveField('imoveltipo_id', $this->request->data['imoveltipo_id'][$key]);
+                $this->Lead->saveField('obs', $this->request->data['obs'][$key]);
+            endforeach;
+
+            $this->Session->setFlash('Lead qualificado com sucesso!', 'default', array('class' => 'mensagem_sucesso'));
+            $this->redirect(array('action' => 'qualify_lead_corretor/' . $id));
+        }
+    }
+
+    /**
+     * relatorio_leads_corretor method
      */
     public function relatorio_leads_corretor() {
 

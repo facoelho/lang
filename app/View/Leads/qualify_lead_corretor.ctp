@@ -1,8 +1,6 @@
 <?php
-echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => "Retornar", "title" => "Retornar")), array('action' => 'index'), array('escape' => false, 'onclick' => 'history.go(-1); return false;'));
-echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "Imprimir todos Leads", "title" => "Imprimir todos Leads")), array('action' => 'relatorio_leads_corretor'), array('escape' => false, 'target' => '_blank'));
+$this->layout = 'naoLogado';
 ?>
-<br><br>
 <?php echo '<b>Origem: </b>' . $leads[0]['Origen']['descricao']; ?>
 <br><br>
 <?php echo '<b>Corretor: </b>' . $leads[0]['Corretor']['nome']; ?>
@@ -11,15 +9,13 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
 <?php echo $this->Form->input('corretor_id', array('id' => 'corretorID', 'type' => 'hidden', 'value' => $leads[0]['Corretor']['id'])); ?>
 <table cellpadding="0" border="0" style ="width:100%;">
     <tr>
-        <th><?php echo 'Cod'; ?></th>
         <th><?php echo 'Cliente'; ?></th>
         <th colspan="13"><?php echo ''; ?></th>
     </tr>
     <?php foreach ($leads as $item): ?>
         <tr>
-            <td><?php echo $item['Cliente']['id']; ?></td>
-            <td><?php echo $item['Cliente']['nome'] . '<br>' . $item['Cliente']['email'] . '<br>' . $item['Cliente']['telefone'] . '<br>' . '<b>' . 'Importado: ' . '</b>' . date('d/m/Y', strtotime($item['Importacaolead']['created'])) . '<br>' . '<b>' . 'Atualizado: ' . '</b>' . (!empty($item['Lead']['dt_alteracao']) ? date('d/m/Y', strtotime($item['Lead']['dt_alteracao'])) : '') . '<br>' . $this->Form->input('corretor_id.' . $item['Lead']['id'], array('id' => 'corretor_idID', 'options' => $corretors, 'type' => 'select', 'label' => false, 'empty' => '-- Alterar corretor --')); ?></td>
-            <td align="center"><?php echo $this->Form->input('dt_alteracao.' . $item['Lead']['id'], array('id' => 'dt_alteracaoID', 'type' => 'checkbox', 'label' => 'Atualizar', 'checked' => false)); ?></td>
+            <td><?php echo $item['Cliente']['nome'] . '<br>' . $item['Cliente']['email'] . '<br>' . $item['Cliente']['telefone'] . '<br>' . '<b>' . 'Importado: ' . '</b>' . date('d/m/Y', strtotime($item['Importacaolead']['created'])) . '<br>' . '<b>' . 'Atualizado: ' . '</b>' . (!empty($item['Lead']['dt_alteracao']) ? date('d/m/Y', strtotime($item['Lead']['dt_alteracao'])) : ''); ?></td>
+
             <?php if ($item['Lead']['sem_atendimento'] == 'S') { ?>
                 <td align="center"><?php echo $this->Form->input('sem_atendimento.' . $item['Lead']['id'], array('id' => 'sem_atendimentoID', 'type' => 'checkbox', 'label' => 'S/atend', 'checked' => true)); ?></td>
             <?php } else { ?>
@@ -51,9 +47,9 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
                 <td align="center"><?php echo $this->Form->input('email.' . $item['Lead']['id'], array('id' => 'emailID', 'type' => 'checkbox', 'label' => 'Email', 'checked' => false)); ?></td>
             <?php } ?>
             <?php if ($item['Lead']['sem_interesse'] == 'S') { ?>
-                <td align="center"><?php echo $this->Form->input('sem_interesse.' . $item['Lead']['id'], array('id' => 'sem_interesseID', 'type' => 'checkbox', 'label' => 'S/int', 'checked' => true)); ?></td>
+                <td align="center"><?php echo $this->Form->input('sem_interesse.' . $item['Lead']['id'], array('id' => 'sem_interesseID', 'type' => 'checkbox', 'label' => 'S/interesse', 'checked' => true)); ?></td>
             <?php } else { ?>
-                <td align="center"><?php echo $this->Form->input('sem_interesse.' . $item['Lead']['id'], array('id' => 'sem_interesseID', 'type' => 'checkbox', 'label' => 'S/int', 'checked' => false)); ?></td>
+                <td align="center"><?php echo $this->Form->input('sem_interesse.' . $item['Lead']['id'], array('id' => 'sem_interesseID', 'type' => 'checkbox', 'label' => 'S/interesse', 'checked' => false)); ?></td>
             <?php } ?>
             <?php if ($item['Lead']['ficha'] == 'S') { ?>
                 <td align="center"><?php echo $this->Form->input('ficha.' . $item['Lead']['id'], array('id' => 'fichaID', 'type' => 'checkbox', 'label' => 'Ficha', 'checked' => true)); ?></td>
@@ -79,7 +75,7 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
             <?php echo $this->Form->input('id.' . $item['Lead']['id'], array('id' => 'clienteID', 'type' => 'hidden', 'value' => $item['Cliente']['id'])); ?>
         </tr>
         <td colspan="4"></td>
-        <td colspan="12"><font size="1"><?php echo $this->Form->input('obs.' . $item['Lead']['id'], array('id' => 'obsID', 'type' => 'text', 'label' => false, 'value' => $item['Lead']['obs'], 'placeholder' => 'Observação', 'style' => 'height: 12px;')); ?></font></td>
+        <td colspan="12"><font size="1"><?php echo $this->Form->input('obs.' . $item['Lead']['id'], array('id' => 'obsID', 'type' => 'textarea', 'label' => false, 'value' => $item['Lead']['obs'], 'placeholder' => 'Observação', 'style' => 'height: 60px;')); ?></font></td>
     <?php endforeach; ?>
 </table>
 <?php echo $this->Form->end(__('Salvar')); ?>

@@ -363,7 +363,7 @@ class ImportacaoleadsController extends AppController {
         $result = $this->Importacaolead->query('select corretors.id, corretors.nome,
                                                        corretors.email as emailcorretor, clientes.nome,
                                                        clientes.email as emailcliente, clientes.telefone,
-                                                       leads.obs_cliente
+                                                       leads.obs_cliente, leads.id as lead_id
                                                   from clientes, leads, corretors
                                                  where clientes.id = leads.cliente_id
                                                    and corretors.id = leads.corretor_id
@@ -381,7 +381,8 @@ class ImportacaoleadsController extends AppController {
             $mensagem = 'Nome: ' . $item[0]['nome'] . '
                          Telefone: ' . $item[0]['telefone'] . '
                             E-mail: ' . $item[0]['emailcliente'] . '
-                            Mensagem: ' . $item[0]['obs_cliente'];
+                            Mensagem: ' . $item[0]['obs_cliente'] . '
+                    Qualificar: ' . 'http://www.imobiliariaeduardolang.com.br/gestao/Leads/qualify_lead_corretor/' . $item[0]['lead_id'];
 
             $Email->send($mensagem);
 
