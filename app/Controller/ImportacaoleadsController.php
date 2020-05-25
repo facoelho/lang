@@ -375,14 +375,14 @@ class ImportacaoleadsController extends AppController {
             $Email = new CakeEmail();
 
             $Email->to($item[0]['emailcorretor']);
-            $Email->subject('Eduardo Lang | Leads');
+            $Email->subject('Novo lead | Atendimento/Qualificação');
             $Email->from('contato@eduardolang.com.br');
 
             $mensagem = 'Nome: ' . $item[0]['nome'] . '
                          Telefone: ' . $item[0]['telefone'] . '
                             E-mail: ' . $item[0]['emailcliente'] . '
                             Mensagem: ' . $item[0]['obs_cliente'] . '
-                    Qualificar: ' . 'http://www.imobiliariaeduardolang.com.br/gestao/Leads/qualify_lead_corretor/' . $item[0]['lead_id'];
+                    Link para qualificar: ' . 'http://www.imobiliariaeduardolang.com.br/gestao/Caracteristicas/lead_caracteristicas/' . $item[0]['lead_id'];
 
             $Email->send($mensagem);
 
