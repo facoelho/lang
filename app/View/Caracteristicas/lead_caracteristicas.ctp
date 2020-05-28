@@ -55,13 +55,18 @@ echo $this->Html->image("/img/logo_medio.png", array("alt" => "Imobiliária Edua
     <div class="mediavalor" style="margin-left:70%;position:relative;float:left;color:#ffcb05">
         <div id="caracteristicas">
             <label><h3><u>Média de valor</u></h3></label><br>
-            <?php echo "<div style='color#fed51b;'>" . $this->Form->input('valor_max', array('id' => 'valorID', 'type' => 'text', 'label' => false)); ?>
+            <?php echo $this->Form->input('valor_max', array('id' => 'valorID', 'type' => 'text', 'label' => false)); ?>
         </div>
+    </div>
+    <div class="observacao" style="margin-left:10%;position:absolute;float:left;margin-top:380px;color:#ffcb05;width:450px;height:200px">
+        <label><h3><u>Observação</u></h3></label><br>
+        <?php echo $this->Form->input('obs', array('id' => 'obsID', 'type' => 'textarea', 'label' => false)); ?>
     </div>
     <?php echo $this->Form->input('nome', array('id' => 'nome', 'type' => 'hidden', 'value' => $lead[0]['Cliente']['nome'])); ?>
     <?php echo $this->Form->input('email', array('id' => 'email', 'type' => 'hidden', 'value' => $lead[0]['Cliente']['email'])); ?>
-    <center><?php echo $this->Form->end(__('Qualificar lead')); ?></center>
-
+    <div class="botao" style="font-size:medium;float:right;height:150px;margin-top:50px">
+        <?php echo $this->Form->end(__('Qualificar lead')); ?>
+    </div>
 </fieldset>
 
 <script type="text/javascript">

@@ -161,8 +161,6 @@ class ContasrecebersController extends AppController {
         );
 
         $this->set('contasrecebers', $this->paginate());
-
-        debug($this->paginate());
     }
 
     /**
