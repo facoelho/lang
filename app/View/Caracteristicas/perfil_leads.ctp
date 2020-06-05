@@ -31,10 +31,10 @@ echo $this->Html->link($this->Html->image("botoes/graficos.png", array("alt" => 
         <th><?php echo $this->Paginator->sort('Cliente.nome', 'Cliente'); ?></th>
         <th><?php echo $this->Paginator->sort('Cliente.telefone', 'Telefone'); ?></th>
         <th><?php echo 'Operação'; ?></th>
+        <th><?php echo 'Situação'; ?></th>
         <th><?php echo 'Bairro'; ?></th>
         <th><?php echo 'Tipo imóvel'; ?></th>
         <th><?php echo 'Dormitórios'; ?></th>
-        <th class="actions"><?php echo __('Ações'); ?></th>
     </tr>
     <?php foreach ($caracteristicas as $item): ?>
         <tr>
@@ -44,19 +44,10 @@ echo $this->Html->link($this->Html->image("botoes/graficos.png", array("alt" => 
             <td><?php echo h($item['Cliente']['nome']); ?>&nbsp;</td>
             <td><?php echo h($item['Cliente']['telefone']); ?>&nbsp;</td>
             <td><?php echo h($item['Operacaotipo']['descricao']); ?>&nbsp;</td>
+            <td><?php echo h($item['Imovelsituacao']['descricao']); ?>&nbsp;</td>
             <td><?php echo h($item['Bairro']['nome']); ?>&nbsp;</td>
             <td><?php echo h($item['Imoveltipo']['descricao']); ?>&nbsp;</td>
             <td><?php echo h($item['Dormitorio']['descricao']); ?>&nbsp;</td>
-            <td>
-                <div id="botoes">
-                    <?php
-                    echo $this->Html->link($this->Html->image("botoes/view_2_min.png", array("alt" => "Visualizar", "title" => "Visualizar")), array('action' => 'view', $item['Caracteristica']['id']), array('escape' => false));
-                    echo $this->Html->link($this->Html->image("botoes/editar_min.png", array("alt" => "Editar", "title" => "Editar")), array('action' => 'edit', $item['Caracteristica']['id']), array('escape' => false));
-                    echo $this->Html->link($this->Html->image('botoes/excluir_min.png', array('alt' => 'Exluir', 'title' => 'Exluir')), array('action' => 'delete', $item['Caracteristica']['id']), array('escape' => false), __('Você realmete deseja apagar esse item?')
-                    );
-                    ?>
-                </div>
-            </td>
         </tr>
     <?php endforeach; ?>
 </table>

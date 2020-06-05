@@ -119,7 +119,7 @@ class CaracteristicasController extends AppController {
 
         $this->loadModel('Lead');
         $lead = $this->Lead->find('all', array(
-            'fields' => array('Lead.id', 'Lead.obs_cliente', 'Lead.dt_alteracao', 'Importacaolead.created', 'Cliente.nome', 'Cliente.email', 'Origen.descricao', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone', 'Corretor.id', 'Corretor.nome'),
+            'fields' => array('Lead.id', 'Lead.obs_cliente', 'Lead.dt_alteracao', 'Importacaolead.created', 'Cliente.nome', 'Cliente.email', 'Cliente.telefone', 'Origen.descricao', 'Corretor.id', 'Corretor.nome'),
             'conditions' => array('Lead.id' => $id),
             'joins' => array(
                 array(
@@ -305,7 +305,7 @@ class CaracteristicasController extends AppController {
         $this->Caracteristica->recursive = 0;
         $this->Paginator->settings = array(
             'fields' => array('Caracteristica.id', 'Lead.id', 'Origen.descricao', 'Cliente.nome', 'Cliente.telefone', 'Cliente.email', 'Caracteristica.valor_max',
-                'Corretor.nome', 'Bairro.nome', 'Origen.descricao', 'Operacaotipo.descricao', 'Imoveltipo.descricao', 'Dormitorio.descricao'),
+                'Corretor.nome', 'Bairro.nome', 'Origen.descricao', 'Operacaotipo.descricao', 'Imoveltipo.descricao', 'Dormitorio.descricao', 'Imovelsituacao.descricao'),
             'joins' => array(
                 array(
                     'table' => 'leads',
@@ -379,6 +379,18 @@ class CaracteristicasController extends AppController {
                     'type' => 'LEFT',
                     'conditions' => array('Dormitorio.id = Caracdormitorio.dormitorio_id')
                 ),
+                array(
+                    'table' => 'caracimovelsituacaos',
+                    'alias' => 'Caracimovelsituacao',
+                    'type' => 'LEFT',
+                    'conditions' => array('Caracteristica.id = Caracimovelsituacao.caracteristica_id')
+                ),
+                array(
+                    'table' => 'imovelsituacaos',
+                    'alias' => 'Imovelsituacao',
+                    'type' => 'LEFT',
+                    'conditions' => array('Imovelsituacao.id = Caracimovelsituacao.imovelsituacao_id')
+                ),
             ),
             'order' => array('Caracteristica.nome' => 'asc')
         );
@@ -396,6 +408,11 @@ class CaracteristicasController extends AppController {
     public function perfil_leads_graficos() {
 
         $conditions_filtro = $this->Session->read('conditions_filtro');
+
+        foreach ($conditions_filtro as $key => $item) {
+            debug($key);
+            debug($item);
+        }
 
         //OPERAÇÃO (COMPRA, VENDA, LOCACAO)
         $result = $this->Caracteristica->query('select distinct operacaotipos.descricao, count(*) as cont

@@ -24,8 +24,18 @@ class ContasrecebersController extends AppController {
 
         $status = array('A' => 'ABERTO', 'F' => 'FECHADO');
 
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
+
         $this->Filter->addFilters(
                 array(
+                    'filter8' => array(
+                        'Negociacaocorretor.corretor_id' => array(
+                            'select' => $corretors
+                        ),
+                    ),
                     'filter1' => array(
                         'Negociacao.referencia' => array(
                             'operator' => 'ILIKE',
@@ -90,7 +100,7 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Contasreceber.id', 'Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'User.nome', 'User.sobrenome'),
+            'fields' => array('DISTINCT Negociacao.id', 'Contasreceber.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -98,20 +108,33 @@ class ContasrecebersController extends AppController {
                     'type' => 'LEFT',
                     'conditions' => array('Contasreceber.id = Contasrecebermov.contasreceber_id')
                 ),
+                array(
+                    'table' => 'negociacaocorretors',
+                    'alias' => 'Negociacaocorretor',
+                    'type' => 'INNER',
+                    'conditions' => array('Negociacao.id = Negociacaocorretor.negociacao_id')
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretor',
+                    'type' => 'INNER',
+                    'conditions' => array('Corretor.id = Negociacaocorretor.corretor_id')
+                ),
             ),
             'limit' => 20,
+            'group' => 'Negociacao.id, Contasreceber.id, Negociacao.cliente_vendedor, Negociacao.cliente_comprador, Negociacao.endereco, Negociacao.referencia, Contasreceber.status, Contasreceber.parcelas, Contasreceber.valor_total',
             'order' => array('Contasreceber.id' => 'asc')
         );
 
         foreach ($this->Filter->getConditions() as $key => $item) :
-            if ($key == 'Contasreceber.status =') {
-                $filter_status = 1;
-            }
+//            if ($key == 'Contasreceber.status =') {
+//                $filter_status = 1;
+//            }
         endforeach;
 
-        if (empty($filter_status)) {
-            $conditions[] = 'Contasreceber.status NOT IN (' . "'F'" . ')';
-        }
+//        if (empty($filter_status)) {
+//            $conditions[] = 'Contasreceber.status NOT IN (' . "'F'" . ')';
+//        }
 
         $this->Filter->setPaginate('conditions', array($this->Filter->getConditions(), $conditions));
 
@@ -155,9 +178,48 @@ class ContasrecebersController extends AppController {
                     'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
                 ),
             ),
-            'conditions' => $conditions_filtro,
             'limit' => '',
-            'order' => array('Contasreceber.id' => 'asc', 'Contasrecebermov.dtvencimento' => 'asc')
+            'conditions' => $conditions_filtro,
+            'order' => array('Contasrecebermov.dtvencimento' => 'asc'),
+        );
+
+        $this->set('contasrecebers', $this->paginate());
+    }
+
+    /**
+     * relatorio_contas_receber method
+     */
+    public function relatorio_comissoes() {
+
+        $conditions_filtro = $this->Session->read('conditions_filtro');
+
+        $this->Contasreceber->recursive = 0;
+        $this->Paginator->settings = array(
+            'fields' => array('Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.nome'),
+            'joins' => array(
+                array(
+                    'table' => 'contasrecebermovs',
+                    'alias' => 'Contasrecebermov',
+                    'type' => 'LEFT',
+                    'conditions' => array('Contasreceber.id = Contasrecebermov.contasreceber_id')
+                ),
+                array(
+                    'table' => 'negociacaocorretors',
+                    'alias' => 'Negociacaocorretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.negociacao_id = Negociacao.id')
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
+                ),
+            ),
+            'limit' => '',
+            'conditions' => $conditions_filtro,
+            'order' => array('Corretor.nome' => 'asc'),
         );
 
         $this->set('contasrecebers', $this->paginate());
@@ -245,6 +307,8 @@ class ContasrecebersController extends AppController {
 
         $dadosUser = $this->Session->read();
 
+        $valor_total = 0;
+
         $this->Contasreceber->id = $id;
         if (!$this->Contasreceber->exists()) {
             $this->Session->setFlash('Registro não encontrado.', 'default', array('class' => 'mensagem_erro'));
@@ -292,6 +356,8 @@ class ContasrecebersController extends AppController {
                     $this->Contasreceber->query('update contasrecebermovs
                                                     set valorparcela = ' . str_replace(',', '.', $this->request->data['valorparcela'][$key]) . '
                                                   where id = ' . $key);
+
+                    $valor_total = $valor_total + $this->request->data['valorparcela'][$key];
                 endforeach;
 
                 foreach ($this->request->data['dtvencimento'] as $key => $item) :
@@ -323,8 +389,8 @@ class ContasrecebersController extends AppController {
                             $caixa = $this->Contasreceber->query('select id from caixas where dtcaixa = ' . "'" . substr($item, 6, 4) . '-' . substr($item, 3, 2) . '-' . substr($item, 0, 2) . "'", false);
                         }
 
-                        $this->Contasreceber->query('insert into lancamentos(caixa_id, descricao, valor, user_id, categoria_id, created, contasrecebermov_id)
-                                                 values(' . $caixa[0][0]['id'] . ',' . "'" . 'RECEBIMENTO NEGOCIACAO CÓDIGO: ' . $negociacao_id . "'" . ',' . str_replace(',', '.', $this->request->data['valorparcela'][$key]) . ',' . $dadosUser['Auth']['User']['id'] . ',' . 77 . ',' . "'" . date('Y-m-d H:i') . "'" . ',' . $key . ')');
+                        $this->Contasreceber->query('insert into lancamentos(caixa_id, descricao, valor, user_id, categoria_id, created, contasrecebermov_id, negociacao_id)
+                                                 values(' . $caixa[0][0]['id'] . ',' . "'" . 'RECEBIMENTO NEGOCIACAO CÓDIGO: ' . $negociacao_id . "'" . ',' . str_replace(',', '.', $this->request->data['valorparcela'][$key]) . ',' . $dadosUser['Auth']['User']['id'] . ',' . 77 . ',' . "'" . date('Y-m-d H:i') . "'" . ',' . $key . ',' . $negociacao_id . ')');
                     }
                 endforeach;
 
@@ -333,6 +399,8 @@ class ContasrecebersController extends AppController {
                 if ($result[0][0]['cont'] == 0) {
                     $this->Contasreceber->query('update contasrecebers set status = ' . "'F'" . ' where id = ' . $id);
                 }
+
+                $this->Contasreceber->query('update contasrecebers set valor_total = ' . $valor_total . ' where id = ' . $id);
 
                 //
                 //CRIA DESEMPENHO

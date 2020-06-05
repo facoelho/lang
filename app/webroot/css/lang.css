@@ -192,6 +192,12 @@ body {
     width: 380px;
 }
 
+#graficos_caracteristicas {
+    position: relative;
+    float: left;
+    width: 500px;
+}
+
 #caracteristicas {
     position: relative;
     float: left;

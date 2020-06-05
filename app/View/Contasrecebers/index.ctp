@@ -1,11 +1,14 @@
 <?php
 echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "Imprimir", "title" => "Imprimir")), array('action' => 'relatorio_contas_receber'), array('escape' => false, 'target' => '_blank'));
+echo $this->Html->link($this->Html->image("botoes/cifrao_2.png", array("alt" => "Imprimir", "title" => "Imprimir")), array('action' => 'relatorio_comissoes'), array('escape' => false, 'target' => '_blank'));
 ?>
 <br>
 <br>
 <div id="filtroGrade">
     <?php
     echo $this->Search->create();
+    echo $this->Search->input('filter8', array('id' => 'corretorID', 'class' => 'select-box', 'placeholder' => 'Corretor', 'empty' => '-- Corretor --'));
+    echo $this->Html->image("separador.png");
     echo $this->Search->input('filter1', array('class' => 'input-box', 'placeholder' => 'Referência'));
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter2', array('class' => 'input-box', 'placeholder' => 'Cliente vendedor'));
@@ -18,7 +21,7 @@ echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter7', array('class' => 'input-box', 'id' => 'datapagto', 'placeholder' => 'Pagamento inicial', 'title' => 'Data inicial'), array('class' => 'input-box', 'id' => 'datapagto2', 'placeholder' => 'Pagamento final', 'title' => 'Data final'));
     echo $this->Html->image("separador.png");
-    echo $this->Search->input('filter5', array('id' => 'statusID', 'class' => 'select-box', 'placeholder' => 'Status'));
+    echo $this->Search->input('filter5', array('id' => 'statusID', 'class' => 'select-box', 'placeholder' => 'Status', 'empty' => '-- Status --'));
     echo $this->Html->image("separador.png");
     ?>
     <input type="submit" value="Filtrar" class="botaoFiltro"/>

@@ -3,8 +3,9 @@
 echo $this->Html->image("/img/logo_medio.png", array("alt" => "Imobiliária Eduardo Lang", "title" => "Imobiliária Eduardo Lang"));
 ?>
 <div id="linha" style="float:right;">
-    <?php echo '<b>' . 'Origem: ' . '</b>' . $lead[0]['Origen']['descricao'] . '</br>' . '</br>' . '<b>' . 'Corretor: ' . '</b>' . $lead[0]['Corretor']['nome'] . '</br>' . '</br>' . '<b>' . 'Enviado: ' . '</b>' . date('d/m/Y H:i', strtotime($lead[0]['Importacaolead']['created'])) . '   ' . '<b>' . 'Atualizado: ' . '</b>' . (!empty($lead[0]['Lead']['dt_alteracao']) ? date('d/m/Y H:i', strtotime($lead[0]['Lead']['dt_alteracao'])) : ''); ?>
+    <?php echo '<b>' . 'Origem: ' . '</b>' . $lead[0]['Origen']['descricao'] . '</br>' . '</br>' . '<b>' . 'Cliente: ' . '</b>' . $lead[0]['Cliente']['nome'] . ' / ' . $lead[0]['Cliente']['email'] . ' / ' . $lead[0]['Cliente']['telefone'] . '</br>' . '</br>' . '<b>' . 'Corretor: ' . '</b>' . $lead[0]['Corretor']['nome'] . '</br>' . '</br>' . '<b>' . 'Enviado: ' . '</b>' . date('d/m/Y H:i', strtotime($lead[0]['Importacaolead']['created'])) . '   ' . '<b>' . 'Atualizado: ' . '</b>' . (!empty($lead[0]['Lead']['dt_alteracao']) ? date('d/m/Y H:i', strtotime($lead[0]['Lead']['dt_alteracao'])) : ''); ?>
 </div>
+<br>
 <br>
 <br>
 <div id="linha" style="padding-top:2%; border-top:3px solid #ffcb05">
