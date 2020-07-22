@@ -10,3 +10,4 @@
 <div id="valor">
     <?php echo $this->GoogleCharts->createJsChart($pie_chart_valor); ?>
 </div>
+<script type="text/javascript" src="/js/jquery-ui-1.8.14.custom.min.js https://www.google.com/jsapi"></script>

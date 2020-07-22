@@ -1675,7 +1675,7 @@ class CaixasController extends AppController {
 
         //Relatório de movimentações - Linhas
 
-        $tipos = array('E' => 'Entradas', 'S' => 'Saidas', 'L' => 'Lucro', 'D' => 'Saldo');
+        $tipos = array('E' => 'Entradas', 'S' => 'Saidas', 'D' => 'Saldo');
 
         $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
 
@@ -1764,7 +1764,7 @@ class CaixasController extends AppController {
 
         //Relatório de movimentações - Barras
 
-        $tipos = array('E' => 'Entradas', 'S' => 'Saidas', 'L' => 'Lucro', 'D' => 'Saldo');
+        $tipos = array('E' => 'Entradas', 'S' => 'Saidas', 'D' => 'Saldo');
 
         $columns_barras['data'] = array('type' => 'string', 'label' => 'Data');
 
@@ -1834,7 +1834,7 @@ class CaixasController extends AppController {
                 }
                 if ($item[0]['tipo'] == 'Saidas') {
                     $saidas = $item[0]['valor'];
-                    $string['Lucro'] = $entradas - $saidas;
+//                    $string['Lucro'] = $entradas - $saidas;
                     $string[] = $entradas - $saidas;
                 }
                 if ($item[0]['tipo'] == 'Retiradas') {

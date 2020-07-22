@@ -33,4 +33,5 @@ echo $this->Html->image("/img/logo.png", array("alt" => "Logo", "title" => "Logo
     </div>
 </div>
 
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 

@@ -34,9 +34,9 @@
             <div id="conteudo">
 
                 <div id="corpo">
-                <?php echo $this->element('navegacao'); ?>
-                <?php echo $this->Session->flash(); ?>
-                <?php echo $this->fetch('content'); ?>
+                    <?php echo $this->element('navegacao'); ?>
+                    <?php echo $this->Session->flash(); ?>
+                    <?php echo $this->fetch('content'); ?>
                 </div>
 
             </div>

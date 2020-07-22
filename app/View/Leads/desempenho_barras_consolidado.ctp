@@ -1,10 +1,9 @@
 <?php
-
 $this->layout = 'naoLogado';
 echo $this->Html->image("/img/logo.png", array("alt" => "Logo", "title" => "Logo"));
 ?>
 <div id="informacao_leads">
-    <b><?php echo date('d/m/Y H:i') ; ?></b>
+    <b><?php echo date('d/m/Y H:i'); ?></b>
 </div>
 
 <p><h2><center><b><?php echo $origen[0][0]['descricao']; ?></b></h2></center></p>
@@ -15,3 +14,4 @@ echo $this->Html->image("/img/logo.png", array("alt" => "Logo", "title" => "Logo
 <div id="chart_div">
     <?php $this->GoogleCharts->createJsChart($column_chart_barras); ?>
 </div>
+<script type="text/javascript" src="/js/jquery-ui-1.8.14.custom.min.js https://www.google.com/jsapi"></script>

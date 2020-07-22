@@ -166,12 +166,19 @@ class CaracteristicasController extends AppController {
             $this->request->data['Caracteristica']['lead_id'] = $id;
             $this->request->data['Caracteristica']['valor_max'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Caracteristica']['valor_max']));
             $this->request->data['Caracteristica']['data'] = date('Y-m-d h:m');
+            $this->request->data['Caracteristica']['obs_corretor'] = $this->request->data['Caracteristica']['obs'];
 
             $this->Caracteristica->create();
 
             if ($this->Caracteristica->save($this->request->data['Caracteristica'])) {
 
                 $caracteristica_id = $this->Caracteristica->getLastInsertId();
+
+                $this->Caracteristica->query('update leads
+                                                 set sem_atendimento = ' . "'N'" . ',
+                                                     dt_alteracao = ' . "'" . date('Y-m-d') . "'" . ',
+                                                     bairro_preferencial_id  = ' . (is_numeric($this->request->data['Caracteristica']['bairro_preferencial_id'])) ? $this->request->data['Caracteristica']['bairro_preferencial_id'] : "null" . '
+                                               where id = ' . $id);
 
                 foreach ($this->request->data['operacao'] as $key => $valor) :
                     if ($valor > 0) {
@@ -205,12 +212,6 @@ class CaracteristicasController extends AppController {
                                 'values(' . $key . ',' . $caracteristica_id . ')');
                     }
                 endforeach;
-
-                $this->Caracteristica->query('update leads
-                                                 set dt_alteracao = ' . "'" . date('Y-m-d') . "'" . ',
-                                                     bairro_preferencial_id  = ' . $this->request->data['Caracteristica']['bairro_preferencial_id'] . ',
-                                                     obs                     = ' . "'" . $this->request->data['Caracteristica']['obs'] . "'" . '
-                                               where id = ' . $id);
             } else {
                 $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
@@ -299,12 +300,30 @@ class CaracteristicasController extends AppController {
                             'select' => $dormitorios
                         ),
                     ),
+                    'filter7' => array(
+                        'Caracteristica.valor_max' => array(
+                            'operator' => 'BETWEEN',
+                            'between' => array(
+                                'text' => __(' e ', true),
+                                'date' => false
+                            )
+                        )
+                    ),
+                    'filter8' => array(
+                        'Caracteristica.data' => array(
+                            'operator' => 'BETWEEN',
+                            'between' => array(
+                                'text' => __(' e ', true),
+                                'date' => true
+                            )
+                        )
+                    ),
                 )
         );
 
         $this->Caracteristica->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('Caracteristica.id', 'Lead.id', 'Origen.descricao', 'Cliente.nome', 'Cliente.telefone', 'Cliente.email', 'Caracteristica.valor_max',
+            'fields' => array('Caracteristica.id', 'Caracteristica.valor_max', 'Caracteristica.obs_corretor', 'Caracteristica.data', 'Lead.id', 'Lead.obs', 'Lead.obs_cliente', 'Origen.descricao', 'Cliente.nome', 'Cliente.telefone', 'Cliente.email', 'Caracteristica.valor_max',
                 'Corretor.nome', 'Bairro.nome', 'Origen.descricao', 'Operacaotipo.descricao', 'Imoveltipo.descricao', 'Dormitorio.descricao', 'Imovelsituacao.descricao'),
             'joins' => array(
                 array(
@@ -392,7 +411,7 @@ class CaracteristicasController extends AppController {
                     'conditions' => array('Imovelsituacao.id = Caracimovelsituacao.imovelsituacao_id')
                 ),
             ),
-            'order' => array('Caracteristica.nome' => 'asc')
+            'order' => array('Caracteristica.data' => 'desc')
         );
 
         $this->Filter->setPaginate('conditions', array($this->Filter->getConditions()));
@@ -408,11 +427,6 @@ class CaracteristicasController extends AppController {
     public function perfil_leads_graficos() {
 
         $conditions_filtro = $this->Session->read('conditions_filtro');
-
-        foreach ($conditions_filtro as $key => $item) {
-            debug($key);
-            debug($item);
-        }
 
         //OPERAÇÃO (COMPRA, VENDA, LOCACAO)
         $result = $this->Caracteristica->query('select distinct operacaotipos.descricao, count(*) as cont

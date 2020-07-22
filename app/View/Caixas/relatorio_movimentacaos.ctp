@@ -16,7 +16,7 @@
     </tr>
     <?php foreach ($result as $key => $item): ?>
         <?php if ($mesano <> $item[0]['mesano']) { ?>
-            <?php if ($cont > 0) { ?>                                                                                                                                                                    
+            <?php if ($cont > 0) { ?>
                 <tr>
                     <td><?php echo ''; ?></td>
                     <td><b><?php echo 'Saldo'; ?></b></td>
@@ -48,19 +48,19 @@
             <td><?php echo number_format($item[0]['valor'], 2, ",", "."); ?>&nbsp;</td>
         </tr>
         <?php if ($item[0]['tipo'] == 'Saidas') { ?>
-            <tr>
-                <td><?php echo ''; ?></td>
-                <td><?php echo 'Lucro'; ?></td>
-                <td><?php echo number_format($entradas - $saidas, 2, ",", "."); ?></td>
-            </tr>
+                <!--<tr>-->
+                    <!--<td><?php // echo '';   ?></td>-->
+                    <!--<td><?php // echo 'Lucro';   ?></td>-->
+                    <!--<td><?php // echo number_format($entradas - $saidas, 2, ",", ".");   ?></td>-->
+            <!--</tr>-->
         <?php } ?>
         <?php $mesano = $item[0]['mesano']; ?>
         <?php $cont++; ?>
     <?php endforeach; ?>
 <!--    <tr>
-<td><?php echo ''; ?></td>
-<td><?php echo 'Lucro'; ?></td>
-<td><?php echo number_format($entradas - $saidas, 2, ",", ""); ?></td>
+<td><?php // echo '';   ?></td>
+<td><?php // echo 'Lucro';   ?></td>
+<td><?php // echo number_format($entradas - $saidas, 2, ",", "");   ?></td>
 </tr>-->
     <tr>
         <td><?php echo ''; ?></td>
@@ -90,3 +90,4 @@
 <div id="chart_div">
     <?php $this->GoogleCharts->createJsChart($column_chart_barras); ?>
 </div>
+<script type="text/javascript" src="/js/jquery-ui-1.8.14.custom.min.js https://www.google.com/jsapi"></script>

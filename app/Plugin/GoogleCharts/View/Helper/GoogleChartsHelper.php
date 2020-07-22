@@ -20,7 +20,8 @@ class GoogleChartsHelper extends AppHelper {
      *
      * @var string
      */
-    public $googleScriptPath = "https://www.google.com/jsapi";
+//    public $googleScriptPath = "https://www.google.com/jsapi";
+    public $googleScriptPath = "https://www.gstatic.com/charts/loader.js";
 
     /**
      * Library Loaded

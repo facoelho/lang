@@ -1,6 +1,7 @@
 <?php
 echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "Imprimir", "title" => "Imprimir")), array('action' => 'relatorio_contas_receber'), array('escape' => false, 'target' => '_blank'));
 echo $this->Html->link($this->Html->image("botoes/cifrao_2.png", array("alt" => "Imprimir", "title" => "Imprimir")), array('action' => 'relatorio_comissoes'), array('escape' => false, 'target' => '_blank'));
+echo $this->Html->link($this->Html->image("botoes/ranking.jpg", array("alt" => "Ranking", "title" => "Ranking")), array('action' => 'relatorio_ranking'), array('escape' => false, 'target' => '_blank'));
 ?>
 <br>
 <br>
@@ -21,6 +22,8 @@ echo $this->Html->link($this->Html->image("botoes/cifrao_2.png", array("alt" => 
     echo $this->Html->image("separador.png");
     echo $this->Search->input('filter7', array('class' => 'input-box', 'id' => 'datapagto', 'placeholder' => 'Pagamento inicial', 'title' => 'Data inicial'), array('class' => 'input-box', 'id' => 'datapagto2', 'placeholder' => 'Pagamento final', 'title' => 'Data final'));
     echo $this->Html->image("separador.png");
+    echo $this->Search->input('filter9', array('id' => 'recebidosID', 'class' => 'select-box', 'placeholder' => 'Recebidos', 'empty' => '-- Recebidos --'));
+    echo $this->Html->image("separador.png");
     echo $this->Search->input('filter5', array('id' => 'statusID', 'class' => 'select-box', 'placeholder' => 'Status', 'empty' => '-- Status --'));
     echo $this->Html->image("separador.png");
     ?>
@@ -31,6 +34,7 @@ echo $this->Html->link($this->Html->image("botoes/cifrao_2.png", array("alt" => 
     <tr>
         <th><?php echo $this->Paginator->sort('id', 'C.receber'); ?></th>
         <th><?php echo $this->Paginator->sort('Negociacao.id', 'Negociação'); ?></th>
+        <th><?php echo $this->Paginator->sort('Corretor.nome', 'Corretor'); ?></th>
         <th><?php echo $this->Paginator->sort('Negociacao.cliente_vendedor', 'Vendedor'); ?></th>
         <th><?php echo $this->Paginator->sort('Negociacao.cliente_comprador', 'Comprador'); ?></th>
         <th><?php echo $this->Paginator->sort('Negociacao.endereco', 'Endereço'); ?></th>
@@ -44,6 +48,7 @@ echo $this->Html->link($this->Html->image("botoes/cifrao_2.png", array("alt" => 
         <tr>
             <td><?php echo h($item['Contasreceber']['id']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['id']); ?>&nbsp;</td>
+            <td><?php echo h($item['Corretor']['nome']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['endereco'] . ' - ' . $item['Negociacao']['referencia']); ?>&nbsp;</td>

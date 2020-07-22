@@ -20,9 +20,15 @@ class ContasrecebersController extends AppController {
 
         $this->set('title_for_layout', 'Contas receber');
 
+        $conditions = array();
+
         $filter_status = '';
 
+        $filtro_pagamento = '';
+
         $status = array('A' => 'ABERTO', 'F' => 'FECHADO');
+
+        $recebidos = array('S' => 'SIM', 'N' => 'NÃO');
 
         $this->loadModel('Corretor');
         $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
@@ -90,6 +96,11 @@ class ContasrecebersController extends AppController {
                             )
                         )
                     ),
+                    'filter9' => array(
+                        'Contasrecebermov.recebidos' => array(
+                            'select' => $recebidos
+                        ),
+                    ),
                     'filter5' => array(
                         'Contasreceber.status' => array(
                             'select' => $status
@@ -100,7 +111,7 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Contasreceber.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total'),
+            'fields' => array('DISTINCT Negociacao.id', 'Contasreceber.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Corretor.nome'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -122,25 +133,51 @@ class ContasrecebersController extends AppController {
                 ),
             ),
             'limit' => 20,
-            'group' => 'Negociacao.id, Contasreceber.id, Negociacao.cliente_vendedor, Negociacao.cliente_comprador, Negociacao.endereco, Negociacao.referencia, Contasreceber.status, Contasreceber.parcelas, Contasreceber.valor_total',
+            'group' => 'Negociacao.id, Contasreceber.id, Negociacao.cliente_vendedor, Negociacao.cliente_comprador, Negociacao.endereco, Negociacao.referencia, Contasreceber.status, Contasreceber.parcelas, Contasreceber.valor_total, Corretor.nome',
             'order' => array('Contasreceber.id' => 'asc')
         );
 
         foreach ($this->Filter->getConditions() as $key => $item) :
-//            if ($key == 'Contasreceber.status =') {
-//                $filter_status = 1;
-//            }
+            if ($key == 'Negociacaocorretor.corretor_id =') {
+                $conditions[] = 'Negociacaocorretor.corretor_id = ' . $item;
+            }
+            if ($key == 'Negociacao.referencia ILIKE') {
+                $conditions[] = 'Negociacao.referencia ILIKE ' . "'" . $item . "'";
+            }
+            if ($key == 'Negociacao.cliente_vendedor ILIKE') {
+                $conditions[] = 'Negociacao.cliente_vendedor ILIKE ' . "'" . $item . "'";
+            }
+            if ($key == 'Negociacao.cliente_comprador ILIKE') {
+                $conditions[] = 'Negociacao.cliente_comprador ILIKE ' . "'" . $item . "'";
+            }
+            if ($key == 'Negociacao.endereco ILIKE') {
+                $conditions[] = 'Negociacao.endereco ILIKE ' . "'" . $item . "'";
+            }
+            if ($key == 'Contasrecebermov.dtvencimento BETWEEN ? AND ?') {
+                $conditions[] = 'Contasrecebermov.dtvencimento BETWEEN' . "'" . $item[0] . "'" . ' AND ' . "'" . $item[1] . "'";
+            }
+            if ($key == 'Contasrecebermov.dtpagamento BETWEEN ? AND ?') {
+                $conditions[] = 'Contasrecebermov.dtpagamento BETWEEN ' . "'" . $item[0] . "'" . ' AND ' . "'" . $item[1] . "'";
+                $filtro_pagamento = 'contasrecebermovs.dtpagamento BETWEEN ' . "'" . $item[0] . "'" . ' AND ' . "'" . $item[1] . "'";
+            }
+            if ($key == 'Contasrecebermov.recebidos =') {
+                if ($item == 'S') {
+                    $conditions[] = 'Contasrecebermov.dtpagamento IS NOT NULL';
+                } else {
+                    $conditions[] = 'Contasrecebermov.dtpagamento IS NULL';
+                }
+            }
+            if ($key == 'Contasreceber.status =') {
+                $conditions[] = 'Contasreceber.status = ' . "'" . $item . "'";
+            }
         endforeach;
 
-//        if (empty($filter_status)) {
-//            $conditions[] = 'Contasreceber.status NOT IN (' . "'F'" . ')';
-//        }
-
-        $this->Filter->setPaginate('conditions', array($this->Filter->getConditions(), $conditions));
+        $this->Filter->setPaginate('conditions', array($conditions));
 
         $this->set('contasrecebers', $this->paginate());
 
-        CakeSession::write('conditions_filtro', array($this->Filter->getConditions()));
+        CakeSession::write('conditions_filtro', array($conditions));
+        CakeSession::write('filtro_pagamento', $filtro_pagamento);
     }
 
     /**
@@ -156,8 +193,8 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.nome'),
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -193,9 +230,14 @@ class ContasrecebersController extends AppController {
 
         $conditions_filtro = $this->Session->read('conditions_filtro');
 
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
+
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
                 'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.nome'),
             'joins' => array(
                 array(
@@ -223,6 +265,145 @@ class ContasrecebersController extends AppController {
         );
 
         $this->set('contasrecebers', $this->paginate());
+    }
+
+    /**
+     * pagamento_comissao  method
+     */
+    public function pagamento_comissao($id) {
+
+        $contasrecebermov = $this->Contasreceber->find('all', array(
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.nome'),
+            'joins' => array(
+                array(
+                    'table' => 'contasrecebermovs',
+                    'alias' => 'Contasrecebermov',
+                    'type' => 'LEFT',
+                    'conditions' => array('Contasreceber.id = Contasrecebermov.contasreceber_id')
+                ),
+                array(
+                    'table' => 'negociacaocorretors',
+                    'alias' => 'Negociacaocorretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.negociacao_id = Negociacao.id')
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
+                ),
+            ),
+            'conditions' => 'Contasrecebermov.id = ' . $id,
+        ));
+
+        $this->set('contasrecebermov', $contasrecebermov);
+
+        $this->loadModel('Corretor');
+
+        $corretors = $this->Corretor->find('list', array(
+            'fields' => array('id', 'nome'),
+            'order' => array('nome' => 'asc')
+        ));
+        $this->set('corretors', $corretors);
+
+        if ($this->request->is('post') || $this->request->is('put')) {
+
+            try {
+
+                $this->Lead->begin();
+
+                foreach ($this->request->data['corretor_id'] as $key => $item) :
+                    $this->Lead->id = $key;
+                    $this->Lead->saveField('corretor_id', $item);
+                endforeach;
+
+                $this->Lead->commit();
+
+                $this->Session->setFlash('Leads alterados com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
+                $this->redirect(array('controller' => 'Importacaoleads', 'action' => 'index'));
+            } catch (Exception $id) {
+                $this->Lead->rollback();
+                $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
+            }
+        } else {
+            $this->request->data = $contasrecebermov;
+        }
+    }
+
+    /**
+     * relatorio_ranking method
+     */
+    public function relatorio_ranking() {
+
+        $conditions_filtro = $this->Session->read('conditions_filtro');
+        $filtro_pagamento = $this->Session->read('filtro_pagamento');
+
+        if (empty($filtro_pagamento)) {
+            $this->Session->setFlash('Data de pagamento é obrigatória.', 'default', array('class' => 'mensagem_erro'));
+            return;
+        }
+
+        $vgv = $this->Contasreceber->query('select corretors.nome, sum(negociacaos.vgv_final) as vgv
+                                              from contasrecebers,
+                                                   negociacaos,
+                                                   negociacaocorretors,
+                                                   corretors
+                                             where contasrecebers.negociacao_id = negociacaos.id
+                                               and negociacaos.id               = negociacaocorretors.negociacao_id
+                                               and corretors.id   		= negociacaocorretors.corretor_id
+                                             group by corretors.nome
+                                             order by sum(contasrecebers.valor_total) desc');
+
+        $this->set('vgv', $vgv);
+
+        $vgv_recebido = $this->Contasreceber->query('select corretors.nome, sum(valorparcela) as parcela
+                                                       from contasrecebers,
+                                                            contasrecebermovs,
+                                                            negociacaos,
+                                                            negociacaocorretors,
+                                                            corretors
+                                                      where contasrecebers.id            = contasrecebermovs.contasreceber_id
+                                                        and contasrecebers.negociacao_id = negociacaos.id
+                                                        and negociacaos.id               = negociacaocorretors.negociacao_id
+                                                        and corretors.id   		    = negociacaocorretors.corretor_id
+                                                        and contasrecebermovs.dtpagamento is not null
+                                                        and ' . $filtro_pagamento . '
+                                                      group by corretors.nome
+                                                      order by sum(valorparcela) desc');
+
+        $this->set('vgv_recebido', $vgv_recebido);
+
+        $total = $this->Contasreceber->query('select corretors.nome, sum(contasrecebers.valor_total) as total
+                                                from contasrecebers,
+                                                     negociacaos,
+                                                     negociacaocorretors,
+                                                     corretors
+                                               where contasrecebers.negociacao_id = negociacaos.id
+                                                 and negociacaos.id               = negociacaocorretors.negociacao_id
+                                                 and corretors.id   		  = negociacaocorretors.corretor_id
+                                                group by corretors.nome
+                                               order by sum(contasrecebers.valor_total) desc');
+
+        $this->set('total', $total);
+
+        $recebidos = $this->Contasreceber->query('select corretors.nome, sum(valorparcela) as parcela
+                                                    from contasrecebers,
+                                                         contasrecebermovs,
+                                                         negociacaos,
+                                                         negociacaocorretors,
+                                                         corretors
+                                                   where contasrecebers.id            = contasrecebermovs.contasreceber_id
+                                                     and contasrecebers.negociacao_id = negociacaos.id
+                                                     and negociacaos.id               = negociacaocorretors.negociacao_id
+                                                     and corretors.id   		    = negociacaocorretors.corretor_id
+                                                     and contasrecebermovs.dtpagamento is not null
+                                                     and ' . $filtro_pagamento . '
+                                                   group by corretors.nome
+                                                   order by sum(valorparcela) desc');
+
+        $this->set('recebidos', $recebidos);
     }
 
     /**
@@ -478,6 +659,33 @@ class ContasrecebersController extends AppController {
                                                 order by dtvencimento');
 
         return $result;
+    }
+
+    public function numero_corretors($id = null) {
+        $result = $this->Contasreceber->query('select count(*) as cont
+                                                 from negociacaocorretors
+                                                where negociacaocorretors.negociacao_id = ' . $id);
+
+        return $result[0][0]['cont'];
+    }
+
+    public function busca_corretors($id = null) {
+
+        $corretors = '';
+
+        $result = $this->Contasreceber->query('select nome
+                                                 from negociacaocorretors, corretors
+                                                where negociacaocorretors.corretor_id = corretors.id
+                                                  and negociacaocorretors.negociacao_id = ' . $id);
+        foreach ($result as $key => $item) :
+            if (empty($corretors)) {
+                $corretors = $item[0]['nome'];
+            } else {
+                $corretors .= ', ' . $item[0]['nome'];
+            }
+        endforeach;
+
+        return $corretors;
     }
 
 }

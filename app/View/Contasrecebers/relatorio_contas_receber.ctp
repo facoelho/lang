@@ -6,6 +6,7 @@ $valor_recebido = 0;
 $valor_a_receber = 0;
 $valor_total = 0;
 $saldo_final = 0;
+$corretors = '';
 ?>
 <div id="informacao_leads">
     <center><b><?php echo 'RELATÓRIO DE CONTAS A RECEBER'; ?></b></center>
@@ -27,11 +28,18 @@ $saldo_final = 0;
         <th><?php echo 'Valor parcela'; ?></th>
     </tr>
     <?php foreach ($contasrecebers as $item): ?>
+        <?php
+        $cont_corretor = $this->requestAction('/Contasrecebers/numero_corretors', array('pass' => array($item['Negociacao']['id'])));
+        ?>
+        <?php $corretors = ''; ?>
         <tr>
             <?php if ($contasreceber_id <> $item['Contasreceber']['id']) { ?>
                 <td><?php echo h($item['Contasreceber']['id']); ?>&nbsp;</td>
                 <td><?php echo h($item['Negociacao']['id']); ?>&nbsp;</td>
-                <td><?php echo h($item['Corretor']['nome']); ?>&nbsp;</td>
+                <?php
+                $corretors = $this->requestAction('/Contasrecebers/busca_corretors', array('pass' => array($item['Negociacao']['id'])));
+                ?>
+                <td><?php echo $corretors; ?>&nbsp;</td>
                 <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
                 <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
                 <?php if ($item['Contasreceber']['status'] == 'A') { ?>
@@ -40,7 +48,7 @@ $saldo_final = 0;
                     <td><strong><font color="green"><?php echo 'Fechado'; ?>&nbsp;</font></strong></td>
                 <?php } ?>
                 <td><?php echo h($item['Contasreceber']['parcelas']); ?>&nbsp;</td>
-                <td><?php echo number_format($item['Contasreceber']['valor_total'], 2, ',', '.'); ?>&nbsp;</td>
+                <td><?php echo number_format(($item['Contasreceber']['valor_total'] / $cont_corretor), 2, ',', '.'); ?>&nbsp;</td>
                 <?php $saldo = $this->requestAction('/Contasrecebers/calcula_saldo', array('pass' => array($item['Contasreceber']['id']))); ?>
                 <td><?php echo number_format($saldo, 2, ',', '.'); ?>&nbsp;</td>
                 <?php $saldo_final = $saldo_final + $saldo; ?>
@@ -58,9 +66,9 @@ $saldo_final = 0;
             <?php } else { ?>
                 <td><?php echo ''; ?>&nbsp;</td>
             <?php } ?>
-            <td><?php echo number_format($item['Contasrecebermov']['valorparcela'], 2, ',', '.'); ?>&nbsp;</td>
+            <td><?php echo number_format(($item['Contasrecebermov']['valorparcela'] / $cont_corretor), 2, ',', '.'); ?>&nbsp;</td>
         </tr>
-        <?php $valor_a_receber = $valor_a_receber + $item['Contasrecebermov']['valorparcela']; ?>
+        <?php $valor_a_receber = $valor_a_receber + ($item['Contasrecebermov']['valorparcela'] / $cont_corretor); ?>
         <?php $contasreceber_id = $item['Contasreceber']['id']; ?>
     <?php endforeach; ?>
 </table>

@@ -14,6 +14,7 @@
         echo $this->Html->meta('icon');
 
         echo $this->Html->css('lang');
+
         echo $this->Html->css('south-street/jquery-ui-1.10.3.custom.min');
         echo $this->Html->css('colorpicker/colorpicker');
 
@@ -74,7 +75,7 @@
                         <br></br>
 
                         <?php if (count($dadosUser['empresasCombo']) > 1) { ?>
-                    <!-- <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href='http://www.sisagro.com/pecuaria/users/trocaEmpresa/' + this.value;"> -->
+                                <!-- <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href='http://www.sisagro.com/pecuaria/users/trocaEmpresa/' + this.value;"> -->
                             <select name="trocaEmpresa" id="trocaEmpresa" class="trocaEmpresa" title="Trocar a empresa" onChange="location.href = 'http://localhost/agenda_express/users/trocaEmpresa/' + this.value;">
                                 <option value="">-- Trocar empresa -- </option>
                                 <?php for ($i = 0; $i < count($dadosUser['empresasCombo']); $i++) { ?>

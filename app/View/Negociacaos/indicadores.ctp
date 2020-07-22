@@ -22,3 +22,4 @@ echo $this->Html->image("/img/logo.png", array("alt" => "Logo", "title" => "Logo
 <div id="chart_div_proposta">
     <?php echo $this->GoogleCharts->createJsChart($piechart_proposta); ?>
 </div>
+<script type="text/javascript" src="/js/jquery-ui-1.8.14.custom.min.js https://www.google.com/jsapi"></script>
