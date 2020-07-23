@@ -75,9 +75,12 @@ $corretors = '';
 <br>
 <table cellpadding="0" cellspacing="0">
     <tr>
-        <td><b><font color="green"><?php echo 'Total de parcelas: ' . number_format($valor_a_receber, 2, ',', '.'); ?>&nbsp;</b></td>
+        <td><b><font color="blue"><?php echo 'Total recebido: ' . number_format($valor_recebido, 2, ',', '.'); ?>&nbsp;</b></td>
     </tr>
     <tr>
-        <td><b><font color="red"><?php echo 'Total à receber: ' . number_format($saldo_final, 2, ',', '.'); ?>&nbsp;</b></td>
+        <td><b><font color="red"><?php echo 'Saldo à receber: ' . number_format($saldo_final, 2, ',', '.'); ?>&nbsp;</b></td>
+    </tr>
+    <tr>
+        <td><b><font color="green"><?php echo 'Total de parcelas: ' . number_format($valor_a_receber, 2, ',', '.'); ?>&nbsp;</b></td>
     </tr>
 </table>
