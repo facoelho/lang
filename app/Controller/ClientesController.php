@@ -167,8 +167,6 @@ class ClientesController extends AppController {
 
         $cliente = $this->Cliente->read(null, $id);
 
-        debug($cliente);
-
         if ($this->request->is('post') || $this->request->is('put')) {
             if ($this->Cliente->save($this->request->data)) {
                 $this->Session->setFlash('Mídia de referência alterada com sucesso.', 'default', array('class' => 'mensagem_sucesso'));

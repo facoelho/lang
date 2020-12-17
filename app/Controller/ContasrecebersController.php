@@ -191,10 +191,16 @@ class ContasrecebersController extends AppController {
             $conditions_filtro = 'Contasreceber.id = ' . $param;
         }
 
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
+
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento'),
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id',
+                'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Corretor.nome'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -217,14 +223,14 @@ class ContasrecebersController extends AppController {
             ),
             'limit' => '',
             'conditions' => $conditions_filtro,
-            'order' => array('Contasrecebermov.dtvencimento' => 'asc'),
+            'order' => 'Corretor.nome asc, Negociacao.cliente_vendedor asc, Contasrecebermov.dtvencimento asc',
         );
 
         $this->set('contasrecebers', $this->paginate());
     }
 
     /**
-     * relatorio_contas_receber method
+     * relatorio_comissoes method
      */
     public function relatorio_comissoes() {
 
@@ -237,8 +243,9 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.nome'),
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id',
+                'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -261,7 +268,7 @@ class ContasrecebersController extends AppController {
             ),
             'limit' => '',
             'conditions' => $conditions_filtro,
-            'order' => array('Corretor.nome' => 'asc'),
+            'order' => 'Corretor.nome asc, Negociacao.cliente_vendedor asc, Contasrecebermov.dtvencimento asc',
         );
 
         $this->set('contasrecebers', $this->paginate());
@@ -354,7 +361,7 @@ class ContasrecebersController extends AppController {
                                                and negociacaos.id               = negociacaocorretors.negociacao_id
                                                and corretors.id   		= negociacaocorretors.corretor_id
                                              group by corretors.nome
-                                             order by sum(contasrecebers.valor_total) desc');
+                                             order by sum(negociacaos.vgv_final) desc');
 
         $this->set('vgv', $vgv);
 

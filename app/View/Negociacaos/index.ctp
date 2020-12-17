@@ -1,5 +1,6 @@
 <?php
 echo $this->Html->link($this->Html->image("botoes/add.png", array("alt" => "Adicionar", "title" => "Adicionar")), array('action' => 'add'), array('escape' => false));
+echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "Imprimir", "title" => "Imprimir")), array('action' => 'relatorio_negociacaos'), array('escape' => false, 'target' => '_blank'));
 echo $this->Html->link($this->Html->image("botoes/graficos.png", array("alt" => "Gráficos", "title" => "Gráficos")), array('action' => 'indicadores'), array('escape' => false, 'target' => '_blank'));
 ?>
 <br>

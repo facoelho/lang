@@ -13,4 +13,4 @@
 <div id="pie_chart_div">
     <?php $this->GoogleCharts->createJsChart($piechart); ?>
 </div>
-<script type="text/javascript" src="/js/jquery-ui-1.8.14.custom.min.js https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="gstatic.com/charts/loader.js"></script>

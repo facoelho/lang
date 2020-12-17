@@ -14,4 +14,4 @@ echo $this->Html->image("/img/logo.png", array("alt" => "Logo", "title" => "Logo
 <div id="chart_div">
     <?php $this->GoogleCharts->createJsChart($column_chart_barras); ?>
 </div>
-<script type="text/javascript" src="/js/jquery-ui-1.8.14.custom.min.js https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="gstatic.com/charts/loader.js"></script>

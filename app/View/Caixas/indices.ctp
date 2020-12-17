@@ -7,8 +7,7 @@
     echo $this->Form->input('categoria_id', array('id' => 'categoriaID', 'type' => 'select', 'label' => 'Categorias'));
     echo $this->Form->input('filhas', array('id' => 'filhasID', 'type' => 'select', 'options' => $filhas, 'label' => 'Categorias filhas', 'empty' => '-- Selecione somente as categorias filhas --'));
     echo $this->Form->input('tipo', array('id' => 'tipoID', 'type' => 'select', 'options' => $tipo, 'label' => 'Tipo de lançamento', 'empty' => '-- Selecione o tipo de lançamento --'));
-//    echo $this->Form->input('Tipoexame.Tipoexame', array('id' => 'tipoexameID', 'title' => 'CTRL + Click (para selecionar mais de um)', 'label' => 'Escolha os tipos de exame', 'type' => 'select', 'multiple' => true));
-//    echo $this->Form->input('tipografico', array('id' => 'tipograficoID', 'options' => $tipografico, 'type' => 'select', 'label' => 'Tipos de gráfico'));
+    echo $this->Form->input('Categoria.Categoria', array('id' => 'categoriasfilhasID', 'title' => 'CTRL + Click (para selecionar mais de um)', 'label' => 'Escolha as categorias', 'type' => 'select', 'style' => 'height: 500px;', 'multiple' => true));
     ?>
 </fieldset>
 <?php echo $this->Form->end(__('Imprimir')); ?>
@@ -60,16 +59,31 @@
                 });
             });
         }
-//        $("#categoriaID").change(function() {
-//            $.ajax({async: true,
-//                data: $("#categoriaID").serialize(),
-//                dataType: "html",
-//                success: function(data, textStatus) {
-//                    $("#tipoexameID").html(data);
-//                },
-//                type: "post",
-//                url: "\/savess_cap/Tipoexames\/buscaRelatoriotipoexames\/Caixa\/" + $("#categoriaID option:selected").val()
-//            });
-//        });
+
+        if (window.location.host !== 'localhost') {
+            $("#tipoID").change(function() {
+                $.ajax({async: true,
+                    data: $("#tipoID").serialize(),
+                    dataType: "html",
+                    success: function(data, textStatus) {
+                        $("#categoriasfilhasID").html(data);
+                    },
+                    type: "post",
+                    url: "http://www.imobiliariaeduardolang.com.br/gestao/\/Categorias\/buscaCategoriasfilhas\/Caixa\/" + $("#tipoID option:selected").val()
+                });
+            });
+        } else {
+            $("#tipoID").change(function() {
+                $.ajax({async: true,
+                    data: $("#tipoID").serialize(),
+                    dataType: "html",
+                    success: function(data, textStatus) {
+                        $("#categoriasfilhasID").html(data);
+                    },
+                    type: "post",
+                    url: "http://localhost/lang\/Categorias\/buscaCategoriasfilhas\/Caixa\/" + $("#tipoID option:selected").val()
+                });
+            });
+        }
     });
 </script>

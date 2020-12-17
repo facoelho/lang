@@ -12,7 +12,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
 //        echo $this->Form->input('vgv', array('id' => 'vgv', 'type' => 'text', 'label' => 'VGV', 'readonly' => true));
     echo $this->Form->input('vgv_final', array('id' => 'vgv_final', 'type' => 'text', 'label' => 'VGV Final', 'readonly' => true));
     echo $this->Form->input('dtvenda', array('id' => 'dtvenda', 'class' => 'data', 'type' => 'text', 'label' => 'Data do fechamento do negócio'));
-    echo $this->Form->input('valor_imovel', array('id' => 'valor_imovel', 'type' => 'text', 'label' => false, 'value' => $negociacao['Negociacao']['valor_proposta'], 'hidden'));
+    echo $this->Form->input('valor_imovel', array('id' => 'valor_imovel', 'type' => 'text', 'label' => false, 'required' => true, 'value' => $negociacao['Negociacao']['valor_proposta'], 'hidden'));
     ?>
 </fieldset>
 <?php echo $this->Form->end(__('Adicionar')); ?>

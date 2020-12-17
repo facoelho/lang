@@ -67,8 +67,10 @@ class Negociacao extends AppModel {
             ),
         ),
         'dtvenda' => array(
-            'notempty' => array(
-                'rule' => array('notempty'),
+            'notEmpty' => array(
+                'rule' => 'notEmpty',
+                'allowEmpty' => true,
+                'last' => false
             ),
         ),
     );

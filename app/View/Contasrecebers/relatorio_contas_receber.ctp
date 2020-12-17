@@ -3,9 +3,9 @@ $this->layout = 'naoLogado';
 $i = 0;
 echo $this->Html->image("/img/logo.png", array("alt" => "Logo", "title" => "Logo"));
 $valor_recebido = 0;
-$valor_a_receber = 0;
 $valor_total = 0;
 $saldo_final = 0;
+$total_parcelas = 0;
 $corretors = '';
 ?>
 <div id="informacao_leads">
@@ -24,7 +24,7 @@ $corretors = '';
         <th><?php echo 'Total'; ?></th>
         <th><?php echo 'Saldo'; ?></th>
         <th><?php echo 'Vencimento'; ?></th>
-        <th><?php echo 'Pagamento'; ?></th>
+        <th><?php echo 'Recebido'; ?></th>
         <th><?php echo 'Valor parcela'; ?></th>
     </tr>
     <?php foreach ($contasrecebers as $item): ?>
@@ -61,14 +61,14 @@ $corretors = '';
                 <td><?php echo ''; ?>&nbsp;</td>
             <?php } ?>
             <?php if (!empty($item['Contasrecebermov']['dtpagamento'])) { ?>
-                <td><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtpagamento'])); ?>&nbsp;</td>
+                <td><font color="blue"><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtpagamento'])); ?>&nbsp;</td>
                 <?php $valor_recebido = $valor_recebido + $item['Contasrecebermov']['valorparcela']; ?>
             <?php } else { ?>
                 <td><?php echo ''; ?>&nbsp;</td>
             <?php } ?>
             <td><?php echo number_format(($item['Contasrecebermov']['valorparcela'] / $cont_corretor), 2, ',', '.'); ?>&nbsp;</td>
         </tr>
-        <?php $valor_a_receber = $valor_a_receber + ($item['Contasrecebermov']['valorparcela'] / $cont_corretor); ?>
+        <?php $total_parcelas = $total_parcelas + ($item['Contasrecebermov']['valorparcela'] / $cont_corretor); ?>
         <?php $contasreceber_id = $item['Contasreceber']['id']; ?>
     <?php endforeach; ?>
 </table>
@@ -81,6 +81,9 @@ $corretors = '';
         <td><b><font color="red"><?php echo 'Saldo à receber: ' . number_format($saldo_final, 2, ',', '.'); ?>&nbsp;</b></td>
     </tr>
     <tr>
-        <td><b><font color="green"><?php echo 'Total de parcelas: ' . number_format($valor_a_receber, 2, ',', '.'); ?>&nbsp;</b></td>
+        <td><b><font color="green"><?php echo 'Total parcelas: ' . number_format($total_parcelas, 2, ',', '.'); ?>&nbsp;</b></td>
+    </tr>
+    <tr>
+        <td><b><font color="green"><?php echo 'Total final: ' . number_format($valor_recebido + $saldo_final, 2, ',', '.'); ?>&nbsp;</b></td>
     </tr>
 </table>

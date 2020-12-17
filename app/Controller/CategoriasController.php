@@ -302,5 +302,38 @@ class CategoriasController extends AppController {
         $this->set('categorias', $categorias);
     }
 
+    public function buscaCategoriasfilhas($chave, $tipoID) {
+
+        $this->layout = 'ajax';
+
+        $dadosUser = $this->Session->read();
+        $empresa_id = $dadosUser['empresa_id'];
+
+        if ($tipoID <> 'T') {
+            $categorias_aux = $this->Categoria->query('select categorias.id, categoriaspai.descricao ||' . "' - '" . '|| categorias.descricao as descricao
+                 from categorias, categorias as categoriaspai
+                where categoriaspai.id = categorias.categoria_pai_id
+                  and categorias.categoria_pai_id IS NOT NULL
+                  and categorias.tipo = ' . "'" . $tipoID . "'" . '
+                order by categoriaspai.descricao, categorias.descricao');
+
+            foreach ($categorias_aux as $key => $item) :
+                $categorias[$item[0]['id']] = $item[0]['descricao'];
+            endforeach;
+        } else {
+            $categorias_aux = $this->Categoria->query('select categorias.id, categoriaspai.descricao ||' . "' - '" . '|| categorias.descricao as descricao
+                 from categorias, categorias as categoriaspai
+                where categoriaspai.id = categorias.categoria_pai_id
+                  and categorias.categoria_pai_id IS NOT NULL
+                order by categoriaspai.descricao, categorias.descricao');
+
+            foreach ($categorias_aux as $key => $item) :
+                $categorias[$item[0]['id']] = $item[0]['descricao'];
+            endforeach;
+        }
+
+        $this->set('categorias', $categorias);
+    }
+
 }
 

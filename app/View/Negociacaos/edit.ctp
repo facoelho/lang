@@ -25,7 +25,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
 <?php echo $this->Form->end(__('Adicionar')); ?>
 <script type="text/javascript">
     jQuery(document).ready(function() {
-//        $("#valor_imovelID").maskMoney({showSymbol: false, decimal: ",", thousands: ".", precision: 2});
-//        $("#valor_propostaID").maskMoney({showSymbol: false, decimal: ",", thousands: ".", precision: 2});
+        $("#valor_imovelID").maskMoney({showSymbol: false, decimal: ",", thousands: ".", precision: 2});
+        $("#valor_propostaID").maskMoney({showSymbol: false, decimal: ",", thousands: ".", precision: 2});
     });
 </script>

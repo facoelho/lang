@@ -121,6 +121,8 @@ class NegociacaosController extends AppController {
         $this->Filter->setPaginate('conditions', array($this->Filter->getConditions(), $conditions));
 
         $this->set('negociacaos', $this->paginate());
+
+        CakeSession::write('conditions_filtro', array($this->Filter->getConditions()));
     }
 
     /**
@@ -217,7 +219,7 @@ class NegociacaosController extends AppController {
 
         $corretors = $this->Corretor->find('list', array(
             'fields' => array('id', 'nome'),
-            'conditions' => array('gerencia' => 'N'),
+//            'conditions' => array('gerencia' => 'N'),
             'order' => array('nome' => 'asc')
         ));
         $this->set(compact('corretors'));
@@ -232,15 +234,30 @@ class NegociacaosController extends AppController {
 
         if ($this->request->is('post') || $this->request->is('put')) {
 
+            debug($this->request->data['Negociacao']['valor_imovel']);
+
             $this->request->data['Negociacao']['user_alt_id'] = $dadosUser['Auth']['User']['id'];
             $this->request->data['Negociacao']['modified'] = date('Y-m-d H:i:s');
             $this->request->data['Negociacao']['valor_imovel'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['valor_imovel']));
             $this->request->data['Negociacao']['valor_proposta'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['valor_proposta']));
 
+            //validação campos
+            $this->request->data['Negociacao']['honorarios'] = 0;
+            $this->request->data['Negociacao']['perc_fechamento'] = 0;
+            $this->request->data['Negociacao']['vgv_final'] = 0;
+//            $this->request->data['Negociacao']['dtvenda'] = '';
+
+            debug($this->request->data['Negociacao']['valor_imovel']);
+//            die();
+
             if ($this->Negociacao->save($this->request->data)) {
                 $this->Session->setFlash('Registro alterado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
                 $this->redirect(array('action' => 'index'));
             } else {
+                debug($this->Negociacao->validationErrors); //show validationErrors
+                debug($this->Negociacao->getDataSource()->getLog(false, false));
+                die();
+
                 $this->Session->setFlash('Registro não foi alterado. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
         } else {
@@ -308,6 +325,45 @@ class NegociacaosController extends AppController {
         }
         $this->Session->setFlash('Registro não foi deletado.', 'default', array('class' => 'mensagem_erro'));
         $this->redirect(array('action' => 'index'));
+    }
+
+    /**
+     * relatorio_negociacaos method
+     */
+    public function relatorio_negociacaos() {
+
+        $conditions_filtro = $this->Session->read('conditions_filtro');
+
+        $conditions[] = 'Negociacao.status NOT IN (' . "'F', 'C'" . ')';
+
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
+
+        $this->Contasreceber->recursive = 0;
+        $this->Paginator->settings = array(
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.valor_proposta', 'Corretor.id', 'Corretor.nome'),
+            'joins' => array(
+                array(
+                    'table' => 'negociacaocorretors',
+                    'alias' => 'Negociacaocorretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.negociacao_id = Negociacao.id')
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
+                ),
+            ),
+            'limit' => '',
+            'conditions' => array($conditions_filtro, $conditions),
+            'order' => 'Corretor.nome asc, Negociacao.cliente_vendedor asc',
+        );
+
+        $this->set('negociacaos', $this->paginate());
     }
 
     /**
