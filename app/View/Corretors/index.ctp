@@ -8,6 +8,7 @@ echo $this->Html->link($this->Html->image("botoes/add.png", array("alt" => "Adic
         <th><?php echo $this->Paginator->sort('id'); ?></th>
         <th><?php echo $this->Paginator->sort('Corretor.nome', 'Nome'); ?></th>
         <th><?php echo $this->Paginator->sort('email', 'E-mail'); ?></th>
+        <th><?php echo $this->Paginator->sort('perc_comissao', '(%)'); ?></th>
         <th><?php echo 'Gerente'; ?></th>
         <th class="actions"><?php echo __('Ações'); ?></th>
     </tr>
@@ -16,6 +17,7 @@ echo $this->Html->link($this->Html->image("botoes/add.png", array("alt" => "Adic
             <td><?php echo h($item['Corretor']['id']); ?>&nbsp;</td>
             <td><?php echo h($item['Corretor']['nome']); ?>&nbsp;</td>
             <td><?php echo h($item['Corretor']['email']); ?>&nbsp;</td>
+            <td><?php echo number_format($item['Corretor']['perc_comissao'], 2, ',', '.'); ?>&nbsp;</td>
             <?php if (!empty($item['Corretor']['gerente_equipe'])) { ?>
                 <?php $nome = $this->requestAction('/Leads/busca_nome_corretor', array('pass' => array($item['Corretor']['gerente_equipe']))); ?>
                 <td><?php echo $nome; ?>&nbsp;</td>

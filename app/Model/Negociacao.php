@@ -73,6 +73,16 @@ class Negociacao extends AppModel {
                 'last' => false
             ),
         ),
+        'nota_imobiliaria' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+            ),
+        ),
+        'nota_corretor' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+            ),
+        ),
     );
 
     /**

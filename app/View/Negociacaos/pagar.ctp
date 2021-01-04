@@ -12,6 +12,8 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
 //        echo $this->Form->input('vgv', array('id' => 'vgv', 'type' => 'text', 'label' => 'VGV', 'readonly' => true));
     echo $this->Form->input('vgv_final', array('id' => 'vgv_final', 'type' => 'text', 'label' => 'VGV Final', 'readonly' => true));
     echo $this->Form->input('dtvenda', array('id' => 'dtvenda', 'class' => 'data', 'type' => 'text', 'label' => 'Data do fechamento do negócio'));
+    echo $this->Form->input('nota_imobiliaria', array('id' => 'nota_imobiliariaID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Nota emitida pela imobiliária?', 'empty' => 'Selecione se emite nota'));
+    echo $this->Form->input('nota_corretor', array('id' => 'nota_corretorID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Nota emitida pelo corretor?', 'empty' => 'Selecione se emite nota'));
     echo $this->Form->input('valor_imovel', array('id' => 'valor_imovel', 'type' => 'text', 'label' => false, 'required' => true, 'value' => $negociacao['Negociacao']['valor_proposta'], 'hidden'));
     ?>
 </fieldset>

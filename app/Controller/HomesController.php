@@ -16,10 +16,12 @@ class HomesController extends AppController {
 
         $this->loadModel('Contasreceber');
 
-        $contasrecebers = $this->Contasreceber->query('select contasrecebers.id, dtvencimento, valorparcela
-                                                         from contasrecebers,
+        $contasrecebers = $this->Contasreceber->query('select negociacaos.cliente_comprador, contasrecebers.id, dtvencimento, valorparcela
+                                                         from negociacaos,
+                                                              contasrecebers,
                                                               contasrecebermovs
-                                                        where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                        where negociacaos.id    = contasrecebers.negociacao_id
+                                                          and contasrecebers.id = contasrecebermovs.contasreceber_id
                                                           and (dtvencimento between CURRENT_DATE and CURRENT_DATE + interval ' . "'30 day'" . ' and dtpagamento is null or (dtvencimento < CURRENT_DATE and dtpagamento is null))
                                                         order by dtvencimento asc');
         $this->set('contasrecebers', $contasrecebers);

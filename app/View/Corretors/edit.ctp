@@ -8,6 +8,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
     <?php
     echo $this->Form->input('nome', array('label' => 'Nome', 'type' => 'text'));
     echo $this->Form->input('email', array('label' => 'E-mail', 'type' => 'text'));
+    echo $this->Form->input('perc_comissao', array('id' => 'perc_comissaoID', 'type' => 'text', 'label' => 'Perc. comissão'));
     if ($this->request->data['Corretor']['gerencia'] == 'S') {
         echo $this->Form->input('gerencia', array('id' => 'gerenteID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Gerente', 'value' => 'S'));
     } else {
@@ -25,6 +26,8 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
 <script type="text/javascript">
 
     jQuery(document).ready(function() {
+
+        $("#perc_comissaoID").maskMoney({showSymbol: false, decimal: ".", precision: 2})
 
         if ($("#gerenteID").val() == 'S') {
             $("#formGerente").hide();

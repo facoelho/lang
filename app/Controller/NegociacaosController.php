@@ -170,6 +170,8 @@ class NegociacaosController extends AppController {
             $this->request->data['Negociacao']['created'] = date('Y-m-d H:i:s');
             $this->request->data['Negociacao']['modified'] = date('Y-m-d H:i:s');
             $this->request->data['Negociacao']['status'] = 'E';
+            $this->request->data['Negociacao']['nota_imobiliaria'] = 'N';
+            $this->request->data['Negociacao']['nota_corretor'] = 'N';
 
             try {
 
@@ -279,6 +281,9 @@ class NegociacaosController extends AppController {
         $negociacao = $this->Negociacao->read(null, $id);
 
         $this->set('negociacao', $negociacao);
+
+        $opcoes = array('N' => 'NÃO', 'S' => 'SIM');
+        $this->set('opcoes', $opcoes);
 
         if ($this->request->is('post')) {
 

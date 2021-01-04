@@ -8,6 +8,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
     <?php
     echo $this->Form->input('nome');
     echo $this->Form->input('email');
+    echo $this->Form->input('perc_comissao', array('id' => 'perc_comissaoID', 'type' => 'text', 'label' => 'Perc. comissão'));
     echo $this->Form->input('gerencia', array('id' => 'gerenteID', 'options' => $opcoes, 'type' => 'select', 'label' => 'Gerente'));
     ?>
     <div id="formGerente">
@@ -21,6 +22,8 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
 <script type="text/javascript">
 
     jQuery(document).ready(function() {
+
+        $("#perc_comissaoID").maskMoney({showSymbol: false, decimal: ".", precision: 2});
 
         $("#formGerente").show();
 

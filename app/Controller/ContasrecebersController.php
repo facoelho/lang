@@ -198,9 +198,58 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id',
-                'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Corretor.nome'),
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
+                'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao'),
+            'joins' => array(
+                array(
+                    'table' => 'contasrecebermovs',
+                    'alias' => 'Contasrecebermov',
+                    'type' => 'LEFT',
+                    'conditions' => array('Contasreceber.id = Contasrecebermov.contasreceber_id')
+                ),
+                array(
+                    'table' => 'negociacaocorretors',
+                    'alias' => 'Negociacaocorretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.negociacao_id = Negociacao.id')
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
+                ),
+            ),
+            'limit' => '',
+            'conditions' => $conditions_filtro,
+            'order' => 'Corretor.nome asc, Negociacao.cliente_vendedor asc, Contasrecebermov.dtvencimento asc',
+        );
+
+        $this->set('contasrecebers', $this->paginate());
+    }
+
+    /**
+     * relatorio_contas_receber method
+     */
+    public function relatorio_contas_receber_individual($param = null) {
+
+        $conditions_filtro = $this->Session->read('conditions_filtro');
+
+        if (!empty($param)) {
+            $conditions_filtro = 'Contasreceber.id = ' . $param;
+        }
+
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
+
+        $this->Contasreceber->recursive = 0;
+        $this->Paginator->settings = array(
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
+                'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -243,9 +292,9 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Contasreceber.negociacao_id',
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
                 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome'),
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
