@@ -26,6 +26,8 @@ class ContasrecebersController extends AppController {
 
         $filtro_pagamento = '';
 
+        $filtro_vencimento = '';
+
         $status = array('A' => 'ABERTO', 'F' => 'FECHADO');
 
         $recebidos = array('S' => 'SIM', 'N' => 'NÃO');
@@ -111,7 +113,7 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Contasreceber.id', 'Negociacao.cliente_vendedor', 'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Corretor.nome'),
+            'fields' => array('DISTINCT Negociacao.id', 'Contasreceber.id', 'Negociacao.cliente_vendedor', 'Negociacao.nota_corretor', 'Negociacao.nota_imobiliaria', 'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Corretor.nome'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -155,6 +157,7 @@ class ContasrecebersController extends AppController {
             }
             if ($key == 'Contasrecebermov.dtvencimento BETWEEN ? AND ?') {
                 $conditions[] = 'Contasrecebermov.dtvencimento BETWEEN' . "'" . $item[0] . "'" . ' AND ' . "'" . $item[1] . "'";
+                $filtro_vencimento = 'contasrecebermovs.dtvencimento BETWEEN ' . "'" . $item[0] . "'" . ' AND ' . "'" . $item[1] . "'";
             }
             if ($key == 'Contasrecebermov.dtpagamento BETWEEN ? AND ?') {
                 $conditions[] = 'Contasrecebermov.dtpagamento BETWEEN ' . "'" . $item[0] . "'" . ' AND ' . "'" . $item[1] . "'";
@@ -178,6 +181,7 @@ class ContasrecebersController extends AppController {
 
         CakeSession::write('conditions_filtro', array($conditions));
         CakeSession::write('filtro_pagamento', $filtro_pagamento);
+        CakeSession::write('filtro_vencimento', $filtro_vencimento);
     }
 
     /**
@@ -198,7 +202,7 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.referencia', 'Negociacao.unidade', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
                 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
                 'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao'),
             'joins' => array(
@@ -292,7 +296,7 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.referencia', 'Negociacao.unidade', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
                 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
                 'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao'),
             'joins' => array(
@@ -395,6 +399,7 @@ class ContasrecebersController extends AppController {
 
         $conditions_filtro = $this->Session->read('conditions_filtro');
         $filtro_pagamento = $this->Session->read('filtro_pagamento');
+        $filtro_vencimento = $this->Session->read('filtro_vencimento');
 
         if (empty($filtro_pagamento)) {
             $this->Session->setFlash('Data de pagamento é obrigatória.', 'default', array('class' => 'mensagem_erro'));
@@ -409,6 +414,10 @@ class ContasrecebersController extends AppController {
                                              where contasrecebers.negociacao_id = negociacaos.id
                                                and negociacaos.id               = negociacaocorretors.negociacao_id
                                                and corretors.id   		= negociacaocorretors.corretor_id
+                                               and contasrecebers.id in (select contasrecebermovs.contasreceber_id
+                                                                           from contasrecebermovs
+                                                                          where contasrecebermovs.contasreceber_id = contasrecebers.id
+                                                                          and ' . $filtro_vencimento . ')
                                              group by corretors.nome
                                              order by sum(negociacaos.vgv_final) desc');
 

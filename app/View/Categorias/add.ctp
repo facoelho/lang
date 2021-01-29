@@ -10,6 +10,8 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
     echo $this->Form->input('categoria_pai_id', array('id' => 'categoriaID', 'type' => 'select', 'options' => $categorias_pai, 'label' => 'Categoria pai', 'empty' => '-- Selecione a categoria pai --'));
 //    echo $this->Form->input('Tipoexame.Tipoexame', array('title' => 'CTRL + Click (para selecionar mais de um)', 'label' => 'Escolha os tipos de exame', 'type' => 'select', 'options' => $tipoexames, 'multiple' => true));
     echo $this->Form->input('tipo', array('id' => 'tipoID', 'type' => 'select', 'options' => $tipo, 'label' => 'Tipo de lançamento'));
+    echo $this->Form->input('mensal', array('id' => 'mensalID', 'type' => 'select', 'options' => $mensal, 'label' => 'Mensal'));
+    echo $this->Form->input('dia_vencimento', array('id' => 'dia_vencimentoID', 'type' => 'text', 'label' => 'Dia do vencimento'));
     echo $this->Form->input('ativo', array('id' => 'ativoID', 'type' => 'select', 'options' => $ativo, 'label' => 'Ativo'));
     echo $this->Form->input('empresa_id', array('type' => 'hidden', 'value' => $empresa_id));
     ?>

@@ -4,10 +4,14 @@ App::uses('AppController', 'Controller');
 
 App::import('Controller', 'Users');
 
+App::uses('CakeEmail', 'Network/Email');
+
 /**
  * Categoria Controller
  */
 class CategoriasController extends AppController {
+
+    var $components = array('Email');
 
     function beforeFilter() {
         $this->set('title_for_layout', 'Categorias');
@@ -99,7 +103,7 @@ class CategoriasController extends AppController {
 
         $this->Categoria->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('Categoria.id', 'Categoria.descricao', 'Categoria.ativo', 'Categoriapai.descricao', 'Categoria.tipo'),
+            'fields' => array('Categoria.id', 'Categoria.descricao', 'Categoria.ativo', 'Categoriapai.descricao', 'Categoria.tipo', 'Categoria.mensal', 'Categoria.dia_vencimento'),
             'joins' => array(
                 array(
                     'table' => 'categorias',
@@ -164,6 +168,9 @@ class CategoriasController extends AppController {
         $ativo = array('S' => 'Ativo', 'N' => 'Inativo');
         $this->set(compact('ativo'));
 
+        $mensal = array('S' => 'SIM', 'N' => 'NÃO');
+        $this->set(compact('mensal'));
+
         $categorias_pai = $this->Categoria->find('list', array('fields' => array('id', 'descricao'),
             'conditions' => array('empresa_id' => $empresa_id, 'categoria_pai_id IS NULL'),
             'order' => array('descricao')));
@@ -210,6 +217,9 @@ class CategoriasController extends AppController {
 
         $ativo = array('S' => 'Ativo', 'N' => 'Inativo');
         $this->set(compact('ativo'));
+
+        $mensal = array('S' => 'SIM', 'N' => 'NÃO');
+        $this->set(compact('mensal'));
 
         $tipo = array('S' => 'Saida', 'E' => 'Entrada', 'R' => 'Retirada');
         $this->set(compact('tipo'));
@@ -333,6 +343,36 @@ class CategoriasController extends AppController {
         }
 
         $this->set('categorias', $categorias);
+    }
+
+    public function send() {
+
+        $corpo_email = '';
+
+        $despesas_fixas = $this->Categoria->query('select descricao from categorias where mensal = ' . "'S'" . 'and dia_vencimento = ' . date('d'));
+
+        foreach ($despesas_fixas as $item) :
+            $corpo_email .= $item[0]['descricao'] . "</br>";
+            debug($corpo_email);
+        endforeach;
+
+        CakeSession::write('corpo_email', array($corpo_email));
+
+        $emails = array('felipe@eduardolang.com.br', 'otaviolang@hotmail.com');
+
+        $Email = new CakeEmail();
+
+        foreach ($emails as $key => $item) :
+            $Email->template('despesas', null)
+                    ->subject('Despesas fixas | Eduardo Lang Imóveis')
+                    ->emailFormat('html')
+                    ->to(trim($item))
+                    ->from(array('contato@eduardolang.com.br' => 'Eduardo Lang Imóveis'))
+                    ->send();
+        endforeach;
+        debug('chegou');
+        die();
+        $this->redirect(array('action' => 'email'));
     }
 
 }

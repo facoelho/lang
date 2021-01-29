@@ -35,6 +35,17 @@ class Categoria extends AppModel {
                 'rule' => array('notempty'),
             ),
         ),
+        'mensal' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+            ),
+        ),
+        'dia_vencimento' => array(
+            'numeric' => array(
+                'rule' => array('numeric'),
+                'allowEmpty' => true,
+            ),
+        ),
     );
 
     /**

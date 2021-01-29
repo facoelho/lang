@@ -38,8 +38,11 @@ echo $this->Html->link($this->Html->image("botoes/ranking.jpg", array("alt" => "
         <th><?php echo $this->Paginator->sort('Negociacao.cliente_vendedor', 'Vendedor'); ?></th>
         <th><?php echo $this->Paginator->sort('Negociacao.cliente_comprador', 'Comprador'); ?></th>
         <th><?php echo $this->Paginator->sort('Negociacao.endereco', 'Endereço'); ?></th>
-        <th><?php echo $this->Paginator->sort('parcelas', 'Nº parcelas'); ?></th>
+        <th><?php echo 'NF EL'; ?></th>
+        <th><?php echo 'NF Cor'; ?></th>
+        <th><?php echo $this->Paginator->sort('parcelas', 'Parcelas'); ?></th>
         <th><?php echo $this->Paginator->sort('valor_total', 'Valor total'); ?></th>
+        <!--<th><?php echo $this->Paginator->sort('valor_total', 'Valor(NF)'); ?></th>-->
         <th><?php echo $this->Paginator->sort('saldo', 'Saldo'); ?></th>
         <th><?php echo $this->Paginator->sort('status', 'Status'); ?></th>
         <th class="actions"><?php echo __('Ações'); ?></th>
@@ -52,8 +55,19 @@ echo $this->Html->link($this->Html->image("botoes/ranking.jpg", array("alt" => "
             <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['endereco'] . ' - ' . $item['Negociacao']['referencia']); ?>&nbsp;</td>
+            <?php if ($item['Negociacao']['nota_imobiliaria'] == 'S') { ?>
+                <td><strong><font color="red"><?php echo h($item['Negociacao']['nota_imobiliaria']); ?>&nbsp;</font></strong></td>
+            <?php } else { ?>
+                <td><strong><font color="blue"><?php echo h($item['Negociacao']['nota_imobiliaria']); ?>&nbsp;</font></strong></td>
+            <?php } ?>
+            <?php if ($item['Negociacao']['nota_corretor'] == 'S') { ?>
+                <td><strong><font color="red"><?php echo h($item['Negociacao']['nota_corretor']); ?>&nbsp;</font></strong></td>
+            <?php } else { ?>
+                <td><strong><font color="blue"><?php echo h($item['Negociacao']['nota_corretor']); ?>&nbsp;</font></strong></td>
+            <?php } ?>
             <td><?php echo h($item['Contasreceber']['parcelas']); ?>&nbsp;</td>
             <td><?php echo number_format($item['Contasreceber']['valor_total'], 2, ',', '.'); ?>&nbsp;</td>
+
             <?php $saldo = $this->requestAction('/Contasrecebers/calcula_saldo', array('pass' => array($item['Contasreceber']['id']))); ?>
             <td><?php echo number_format($saldo, 2, ',', '.'); ?>&nbsp;</td>
             <?php if ($item['Contasreceber']['status'] == 'A') { ?>

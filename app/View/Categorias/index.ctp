@@ -27,6 +27,8 @@ echo $this->Html->link($this->Html->image("botoes/add.png", array("alt" => "Adic
         <th><?php echo $this->Paginator->sort('id'); ?></th>
         <th><?php echo $this->Paginator->sort('descricao', 'Descrição'); ?></th>
         <th><?php echo $this->Paginator->sort('categoria_pai_id', 'Categoria pai'); ?></th>
+        <th><?php echo $this->Paginator->sort('mensal', 'Mensal'); ?></th>
+        <th><?php echo $this->Paginator->sort('dia_vencimento', 'Vencimento'); ?></th>
         <th><?php echo $this->Paginator->sort('ativo', 'Ativo'); ?></th>
         <th class="actions"><?php echo __('Ações'); ?></th>
     </tr>
@@ -35,6 +37,12 @@ echo $this->Html->link($this->Html->image("botoes/add.png", array("alt" => "Adic
             <td><?php echo h($item['Categoria']['id']); ?>&nbsp;</td>
             <td><?php echo h($item['Categoria']['descricao']); ?>&nbsp;</td>
             <td><?php echo h($item['Categoriapai']['descricao']); ?>&nbsp;</td>
+            <?php if ($item['Categoria']['mensal'] == 'S') { ?>
+                <td><?php echo 'SIM'; ?>&nbsp;</td>
+            <?php } else { ?>
+                <td><?php echo 'NÃO'; ?>&nbsp;</td>
+            <?php } ?>
+            <td><?php echo h($item['Categoria']['dia_vencimento']); ?>&nbsp;</td>
             <?php if ($item['Categoria']['ativo'] == 'S') { ?>
                 <td><?php echo 'SIM'; ?>&nbsp;</td>
             <?php } else { ?>
