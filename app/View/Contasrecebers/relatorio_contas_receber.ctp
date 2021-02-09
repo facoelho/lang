@@ -28,6 +28,8 @@ $nome = '';
         <th><?php echo 'Comprador'; ?></th>
         <th><?php echo 'Ref'; ?></th>
         <th><?php echo 'Unid'; ?></th>
+        <th><?php echo 'Vencimento'; ?></th>
+        <th><?php echo 'Recebimento'; ?></th>
         <th><?php echo 'NF EL'; ?></th>
         <th><?php echo 'NF Cor'; ?></th>
         <th><?php echo 'Parcela'; ?></th>
@@ -41,7 +43,7 @@ $nome = '';
         <?php if ($corretor <> $item['Corretor']['id']) { ?>
             <?php if ($total_corretor_individual > 0) { ?>
                 <tr>
-                    <td colspan="10"><?php echo ''; ?>&nbsp;</td>
+                    <td colspan="12"><?php echo ''; ?>&nbsp;</td>
                     <td><strong><font color="blue"><?php echo number_format($total_corretor_individual, 2, ',', '.'); ?>&nbsp;</font></strong></td>
                 </tr>
                 <?php
@@ -59,12 +61,17 @@ $nome = '';
             <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['referencia']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['unidade']); ?>&nbsp;</td>
+            <td><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtvencimento'])); ?></td>
+            <?php if (!empty($item['Contasrecebermov']['dtpagamento'])) { ?>
+                <td><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtpagamento'])); ?></td>
+            <?php } else { ?>
+                <td><?php echo ''; ?>&nbsp;</td>
+            <?php } ?>
 
             <?php if ($item['Negociacao']['nota_imobiliaria'] == 'S') { ?>
                 <td><strong><font color="red"><?php echo h($item['Negociacao']['nota_imobiliaria']); ?>&nbsp;</font></strong></td>
             <?php } else { ?>
                 <td><strong><font color="blue"><?php echo h($item['Negociacao']['nota_imobiliaria']); ?>&nbsp;</font></strong></td>
-
             <?php } ?>
 
             <?php if ($item['Negociacao']['nota_corretor'] == 'S') { ?>
@@ -96,9 +103,9 @@ $nome = '';
                 <td><?php echo number_format(($item['Contasrecebermov']['valorparcela'] / $cont_corretor) - (($item['Contasrecebermov']['valorparcela'] / $cont_corretor) / 100 * 15), 2, ',', '.'); ?>&nbsp;</td>
                 <td><?php echo number_format((($item['Contasrecebermov']['valorparcela'] / $cont_corretor) * $item['Corretor']['perc_comissao']) - ((($item['Contasrecebermov']['valorparcela'] / $cont_corretor) * $item['Corretor']['perc_comissao']) / 100 * 15), 2, ',', '.'); ?>&nbsp;</td>
                 <?php if (($item['Negociacao']['id'] == 27) or ($item['Negociacao']['id'] == 52) or ($item['Negociacao']['id'] == 60) or ($item['Negociacao']['id'] == 35) or ($item['Negociacao']['id'] == 28) or ($item['Negociacao']['id'] == 32) or ($item['Negociacao']['id'] == 49) or ($item['Negociacao']['id'] == 28)) { ?>
-                        <!--<td><?php echo number_format((($item['Contasrecebermov']['valorparcela'] / $cont_corretor) * 0.05) - ((($item['Contasrecebermov']['valorparcela'] / $cont_corretor) * 0.05) / 100 * 15), 2, ',', '.'); ?>&nbsp;</td>-->
+                                                            <!--<td><?php echo number_format((($item['Contasrecebermov']['valorparcela'] / $cont_corretor) * 0.05) - ((($item['Contasrecebermov']['valorparcela'] / $cont_corretor) * 0.05) / 100 * 15), 2, ',', '.'); ?>&nbsp;</td>-->
                 <?php } else { ?>
-                    <td><?php // echo number_format((0), 2, ',', '.');   ?>&nbsp;</td>
+                    <td><?php // echo number_format((0), 2, ',', '.');            ?>&nbsp;</td>
                 <?php } ?>
 
                 <?php $total_corretor = $total_corretor + (($item['Contasrecebermov']['valorparcela'] / $cont_corretor) * $item['Corretor']['perc_comissao']) - ((($item['Contasrecebermov']['valorparcela'] / $cont_corretor) * $item['Corretor']['perc_comissao']) / 100 * 15); ?>
@@ -158,19 +165,19 @@ $nome = '';
         <?php $nome = $item['Corretor']['nome']; ?>
     <?php endforeach; ?>
     <tr>
-        <td colspan="10"><?php echo ''; ?>&nbsp;</td>
+        <td colspan="12"><?php echo ''; ?>&nbsp;</td>
         <td><strong><font color="blue"><?php echo number_format($total_corretor_individual, 2, ',', '.'); ?>&nbsp;</font></strong></td>
     </tr>
 </table>
 <br>
 <table cellpadding="0" cellspacing="0">
     <tr>
-        <td><b><font color="green"><?php echo 'Total recebido (NF): ' . number_format($total_recebido, 2, ',', '.'); ?>&nbsp;</b></td>
+        <!--<td><b><font color="green"><?php echo 'Total recebido (NF): ' . number_format($total_recebido, 2, ',', '.'); ?>&nbsp;</b></td>-->
     </tr>
     <tr>
         <td><b><font color="red"><?php echo 'Total Corretor: ' . number_format($total_corretor, 2, ',', '.'); ?>&nbsp;</b></td>
     </tr>
     <tr>
-        <td><b><font color="blue"><?php echo 'Total EL: ' . number_format($total_el, 2, ',', '.'); ?>&nbsp;</b></td>
+        <!--<td><b><font color="blue"><?php echo 'Total EL: ' . number_format($total_el, 2, ',', '.'); ?>&nbsp;</b></td>-->
     </tr>
 </table>

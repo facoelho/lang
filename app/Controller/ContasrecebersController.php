@@ -297,8 +297,8 @@ class ContasrecebersController extends AppController {
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
             'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.referencia', 'Negociacao.unidade', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
-                'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao'),
+                'Negociacao.corretor_agenciador_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao', 'Corretoragenciador.nome'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -317,6 +317,12 @@ class ContasrecebersController extends AppController {
                     'alias' => 'Corretor',
                     'type' => 'LEFT',
                     'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretoragenciador',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacao.corretor_agenciador_id = Corretoragenciador.id')
                 ),
             ),
             'limit' => '',

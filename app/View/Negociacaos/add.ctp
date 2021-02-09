@@ -14,6 +14,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
     echo $this->Form->input('valor_imovel', array('id' => 'valor_imovelID', 'type' => 'text', 'label' => 'Valor imóvel'));
     echo $this->Form->input('valor_proposta', array('id' => 'valor_propostaID', 'type' => 'text', 'label' => 'Valor proposta'));
     echo $this->Form->input('corretor', array('id' => 'corretorID', 'title' => 'CTRL + Click (para selecionar mais de um)', 'label' => 'Corretor', 'type' => 'select', 'multiple' => true));
+    echo $this->Form->input('Negociacao.corretor_agenciador_id', array('id' => 'statusID', 'options' => $corretors, 'label' => 'Agenciador', 'empty' => '-- Selecione o agenciador --'));
     echo $this->Form->input('Negociacaostat.status', array('id' => 'statusID', 'options' => $status, 'label' => 'Status'));
     echo $this->Form->input('Negociacaostat.obs', array('id' => 'obs', 'label' => 'Observação'));
     ?>

@@ -168,7 +168,7 @@ class CategoriasController extends AppController {
         $ativo = array('S' => 'Ativo', 'N' => 'Inativo');
         $this->set(compact('ativo'));
 
-        $mensal = array('S' => 'SIM', 'N' => 'NÃO');
+        $mensal = array('N' => 'NÃO', 'S' => 'SIM');
         $this->set(compact('mensal'));
 
         $categorias_pai = $this->Categoria->find('list', array('fields' => array('id', 'descricao'),
@@ -351,27 +351,36 @@ class CategoriasController extends AppController {
 
         $despesas_fixas = $this->Categoria->query('select descricao from categorias where mensal = ' . "'S'" . 'and dia_vencimento = ' . date('d'));
 
-        foreach ($despesas_fixas as $item) :
-            $corpo_email .= $item[0]['descricao'] . "</br>";
-            debug($corpo_email);
-        endforeach;
+        if (!empty($despesas_fixas)) {
+            $corpo_email .= 'Despesas com vencimento: ' . date('d/m/Y') . "<br/>";
+            $corpo_email .= "<br/>";
 
-        CakeSession::write('corpo_email', array($corpo_email));
+            foreach ($despesas_fixas as $item) :
+                $corpo_email .= $item[0]['descricao'] . "<br/>";
+            endforeach;
 
-        $emails = array('felipe@eduardolang.com.br', 'otaviolang@hotmail.com');
+            CakeSession::write('corpo_email', array($corpo_email));
 
-        $Email = new CakeEmail();
+            //$emails = array('felipe@eduardolang.com.br', 'otaviolang@hotmail.com');
+            $emails = array('felipe@eduardolang.com.br');
 
-        foreach ($emails as $key => $item) :
-            $Email->template('despesas', null)
-                    ->subject('Despesas fixas | Eduardo Lang Imóveis')
-                    ->emailFormat('html')
-                    ->to(trim($item))
-                    ->from(array('contato@eduardolang.com.br' => 'Eduardo Lang Imóveis'))
-                    ->send();
-        endforeach;
-        debug('chegou');
-        die();
+            $Email = new CakeEmail();
+
+            foreach ($emails as $key => $item) :
+                $Email->template('despesas', null)
+                        ->subject('Despesas fixas | Eduardo Lang Imóveis')
+                        ->emailFormat('html')
+                        ->to(trim($item))
+                        ->from(array('contato@eduardolang.com.br' => 'Eduardo Lang Imóveis'))
+                        ->send();
+            endforeach;
+            echo 'Despesas enviadas';
+            die();
+        } else {
+            echo 'Não tem despesas para esta data';
+            die();
+        }
+
         $this->redirect(array('action' => 'email'));
     }
 

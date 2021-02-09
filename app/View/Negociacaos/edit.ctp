@@ -19,7 +19,7 @@ echo $this->Html->link($this->Html->image("botoes/retornar.png", array("alt" => 
         echo $this->Form->input('valor_proposta', array('id' => 'valor_propostaID', 'type' => 'text', 'label' => 'Valor proposta', 'readonly'));
     }
     echo $this->Form->input('Corretor.Corretor', array('title' => 'CTRL + Click (para selecionar mais de um)', 'label' => 'Escolha o(s) corretor(es)', 'type' => 'select', 'multiple' => true));
-//    echo $this->Form->input('status', array('id' => 'statusID', 'label' => 'Status'));
+    echo $this->Form->input('Negociacao.corretor_agenciador_id', array('id' => 'statusID', 'options' => $corretors, 'label' => 'Agenciador', 'empty' => '-- Selecione o agenciador --'));
     ?>
 </fieldset>
 <?php echo $this->Form->end(__('Adicionar')); ?>
