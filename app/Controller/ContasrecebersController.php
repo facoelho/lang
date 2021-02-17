@@ -4,6 +4,8 @@ App::uses('AppController', 'Controller');
 
 App::import('Controller', 'Users');
 
+App::uses('GoogleCharts', 'GoogleCharts.Lib');
+
 /**
  * Contasrecebers Controller
  */
@@ -685,6 +687,709 @@ class ContasrecebersController extends AppController {
                 $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
         }
+    }
+
+    public function metas() {
+
+        $tipos = array('1' => '1º TRIMESTRE', '2' => '2º TRIMESTRE', '3' => '3º TRIMESTRE', '4' => '4º TRIMESTRE', 'I' => 'META ANO - INDIVIDUAL', 'A' => 'META ANO - IMOBILIÁRIA');
+        $this->set('tipos', $tipos);
+
+        if ($this->request->is('post') || $this->request->is('put')) {
+            CakeSession::write('meta_ano', $this->request->data['Relatorio']['ano']);
+            if ($this->request->data['Relatorio']['tipo'] == '1') {
+                $this->redirect(array('action' => 'metas_acompanhamento_primeiro'));
+            } elseif ($this->request->data['Relatorio']['tipo'] == '2') {
+                $this->redirect(array('action' => 'metas_acompanhamento_segundo'));
+            } elseif ($this->request->data['Relatorio']['tipo'] == '3') {
+                $this->redirect(array('action' => 'metas_acompanhamento_terceiro'));
+            } elseif ($this->request->data['Relatorio']['tipo'] == '4') {
+                $this->redirect(array('action' => 'metas_acompanhamento_quarto'));
+            } elseif ($this->request->data['Relatorio']['tipo'] == 'I') {
+                $this->redirect(array('action' => 'metas_acompanhamento_individual_ano '));
+            } elseif ($this->request->data['Relatorio']['tipo'] == 'A') {
+                $this->redirect(array('action' => 'metas_acompanhamento_ano'));
+            }
+        }
+    }
+
+    public function metas_acompanhamento_primeiro() {
+
+        $meta_ano = $this->Session->read('meta_ano');
+
+        $vgv_recebido_total = 0;
+
+        //-------- PRIMEIRO TRIMESTRE ----------------
+
+        $perc_45 = 1080000.01;
+        $perc_50 = 2160000.01;
+        $cont = 0;
+
+        $columns_barras['data'] = array('type' => 'string', 'label' => 'Metas');
+        $columns_barras['50'] = array('type' => 'number', 'label' => 'Meta 50%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras['45'] = array('type' => 'number', 'label' => 'Meta 45%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+
+        $string = array();
+
+        $column_chart_barras = new GoogleCharts();
+
+        $column_chart_barras->type('BarChart');
+
+        $column_chart_barras->options(array(
+            'width' => '50%',
+            'height' => '25%',
+            'title' => '',
+            'vAxis' => array('minValue' => 0),
+            'titleTextStyle' => array('color' => 'grenn'),
+            'fontSize' => 12,
+        ));
+
+        $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                    from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                   where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                     and corretors.id      = negociacaocorretors.corretor_id
+                                                     and negociacaos.id = contasrecebers.negociacao_id
+                                                     and negociacaos.id = negociacaocorretors.negociacao_id
+                                                     and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-03-31' . "'" . '
+                                                   group by corretors.id, corretors.nome
+                                                   order by sum(valorparcela) desc');
+
+        $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
+        foreach ($corretors as $key => $item) :
+            $columns_barras[$item[0]['nome']] = array('type' => 'number', 'label' => $item[0]['nome']);
+            $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        endforeach;
+
+        $string['50'] = $perc_50;
+        $string[] = $perc_50;
+        $string['45'] = $perc_45;
+        $string[] = $perc_45;
+
+        $column_chart_barras->columns($columns_barras);
+
+        foreach ($corretors as $key => $corretor) :
+
+            $vgv_recebido = 0;
+
+            $negociacaos = $this->Contasreceber->query('select contasrecebers.negociacao_id, vgv_final, valorparcela, honorarios
+                                                          from contasrecebers,
+                                                               contasrecebermovs,
+                                                               negociacaos,
+                                                               negociacaocorretors
+                                                         where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                           and negociacaos.id = contasrecebers.negociacao_id
+                                                           and negociacaos.id = negociacaocorretors.negociacao_id
+                                                           and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
+                                                           and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-03-31' . "'");
+
+            if (!empty($negociacaos)) {
+
+                foreach ($negociacaos as $negociacao) :
+                    $vgv_recebido = $vgv_recebido + (($negociacao[0]['vgv_final'] * $negociacao[0]['valorparcela']) / $negociacao[0]['honorarios']);
+                endforeach;
+
+                $string[$corretor[0]['nome']] = $vgv_recebido;
+                $string[] = $vgv_recebido;
+
+                $vgv_recebido_total = $vgv_recebido_total + $vgv_recebido;
+            }
+        endforeach;
+
+        $column_chart_barras->addRow($string);
+
+        $this->set(compact('column_chart_barras'));
+
+        //-------- FIM PRIMEIRO TRIMESTRE ----------------
+    }
+
+    public function metas_acompanhamento_segundo() {
+
+        $meta_ano = $this->Session->read('meta_ano');
+
+        $vgv_recebido_total = 0;
+
+        //-------- SEGUNDO TRIMESTRE ----------------
+
+        $perc_45 = 1080000.01;
+        $perc_50 = 2160000.01;
+        $cont = 0;
+
+        $columns_barras['data'] = array('type' => 'string', 'label' => 'Metas');
+        $columns_barras['50'] = array('type' => 'number', 'label' => 'Meta 50%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras['45'] = array('type' => 'number', 'label' => 'Meta 45%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+
+        $string = array();
+
+        $column_chart_barras = new GoogleCharts();
+
+        $column_chart_barras->type('BarChart');
+
+        $column_chart_barras->options(array(
+            'width' => '50%',
+            'heigth' => '30%',
+            'title' => '',
+            'vAxis' => array('minValue' => 0),
+            'titleTextStyle' => array('color' => 'grenn'),
+            'fontSize' => 12,
+        ));
+
+        $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                    from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                   where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                     and corretors.id      = negociacaocorretors.corretor_id
+                                                     and negociacaos.id = contasrecebers.negociacao_id
+                                                     and negociacaos.id = negociacaocorretors.negociacao_id
+                                                     and dtpagamento between ' . "'" . '2021-04-01' . "'" . ' and ' . "'" . '2021-06-30' . "'" . '
+                                                   group by corretors.id, corretors.nome
+                                                   order by sum(valorparcela) desc');
+
+        $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
+        foreach ($corretors as $key => $item) :
+            $columns_barras[$item[0]['nome']] = array('type' => 'number', 'label' => $item[0]['nome']);
+            $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        endforeach;
+
+        $string['50'] = $perc_50;
+        $string[] = $perc_50;
+        $string['45'] = $perc_45;
+        $string[] = $perc_45;
+
+        $column_chart_barras->columns($columns_barras);
+
+        foreach ($corretors as $key => $corretor) :
+
+            $vgv_recebido = 0;
+
+            $negociacaos = $this->Contasreceber->query('select contasrecebers.negociacao_id, vgv_final, valorparcela, honorarios
+                                                          from contasrecebers,
+                                                               contasrecebermovs,
+                                                               negociacaos,
+                                                               negociacaocorretors
+                                                         where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                           and negociacaos.id = contasrecebers.negociacao_id
+                                                           and negociacaos.id = negociacaocorretors.negociacao_id
+                                                           and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
+                                                           and dtpagamento between ' . "'" . '2021-04-01' . "'" . ' and ' . "'" . '2021-06-30' . "'");
+
+            if (!empty($negociacaos)) {
+
+                foreach ($negociacaos as $negociacao) :
+                    $vgv_recebido = $vgv_recebido + (($negociacao[0]['vgv_final'] * $negociacao[0]['valorparcela']) / $negociacao[0]['honorarios']);
+                endforeach;
+
+                $string[$corretor[0]['nome']] = $vgv_recebido;
+                $string[] = $vgv_recebido;
+
+                $vgv_recebido_total = $vgv_recebido_total + $vgv_recebido;
+            }
+        endforeach;
+
+        $column_chart_barras->addRow($string);
+
+        $this->set(compact('column_chart_barras'));
+
+        //-------- FIM SEGUNDO TRIMESTRE ----------------
+    }
+
+    public function metas_acompanhamento_terceiro() {
+
+        $meta_ano = $this->Session->read('meta_ano');
+
+        $vgv_recebido_total = 0;
+
+        //-------- TERCEIRO TRIMESTRE ----------------
+
+        $perc_45 = 1080000.01;
+        $perc_50 = 2160000.01;
+        $cont = 0;
+
+        $columns_barras['data'] = array('type' => 'string', 'label' => 'Metas');
+        $columns_barras['50'] = array('type' => 'number', 'label' => 'Meta 50%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras['45'] = array('type' => 'number', 'label' => 'Meta 45%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+
+        $string = array();
+
+        $column_chart_barras = new GoogleCharts();
+
+        $column_chart_barras->type('BarChart');
+
+        $column_chart_barras->options(array(
+            'width' => '50%',
+            'heigth' => '30%',
+            'title' => '',
+            'vAxis' => array('minValue' => 0),
+            'titleTextStyle' => array('color' => 'grenn'),
+            'fontSize' => 12,
+        ));
+
+        $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                    from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                   where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                     and corretors.id      = negociacaocorretors.corretor_id
+                                                     and negociacaos.id = contasrecebers.negociacao_id
+                                                     and negociacaos.id = negociacaocorretors.negociacao_id
+                                                     and dtpagamento between ' . "'" . '2021-07-01' . "'" . ' and ' . "'" . '2021-09-30' . "'" . '
+                                                   group by corretors.id, corretors.nome
+                                                   order by sum(valorparcela) desc');
+
+        $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
+        foreach ($corretors as $key => $item) :
+            $columns_barras[$item[0]['nome']] = array('type' => 'number', 'label' => $item[0]['nome']);
+            $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        endforeach;
+
+        $string['50'] = $perc_50;
+        $string[] = $perc_50;
+        $string['45'] = $perc_45;
+        $string[] = $perc_45;
+
+        $column_chart_barras->columns($columns_barras);
+
+        foreach ($corretors as $key => $corretor) :
+
+            $vgv_recebido = 0;
+
+            $negociacaos = $this->Contasreceber->query('select contasrecebers.negociacao_id, vgv_final, valorparcela, honorarios
+                                                          from contasrecebers,
+                                                               contasrecebermovs,
+                                                               negociacaos,
+                                                               negociacaocorretors
+                                                         where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                           and negociacaos.id = contasrecebers.negociacao_id
+                                                           and negociacaos.id = negociacaocorretors.negociacao_id
+                                                           and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
+                                                           and dtpagamento between ' . "'" . '2021-07-01' . "'" . ' and ' . "'" . '2021-09-30' . "'");
+
+            if (!empty($negociacaos)) {
+
+                foreach ($negociacaos as $negociacao) :
+                    $vgv_recebido = $vgv_recebido + (($negociacao[0]['vgv_final'] * $negociacao[0]['valorparcela']) / $negociacao[0]['honorarios']);
+                endforeach;
+
+                $string[$corretor[0]['nome']] = $vgv_recebido;
+                $string[] = $vgv_recebido;
+
+                $vgv_recebido_total = $vgv_recebido_total + $vgv_recebido;
+            }
+        endforeach;
+
+        $column_chart_barras->addRow($string);
+
+        $this->set(compact('column_chart_barras'));
+
+        //-------- FIM TERCEIRO TRIMESTRE ----------------
+    }
+
+    public function metas_acompanhamento_quarto() {
+
+        $meta_ano = $this->Session->read('meta_ano');
+
+        $vgv_recebido_total = 0;
+
+        //-------- QUARTO TRIMESTRE ----------------
+
+        $perc_45 = 1080000.01;
+        $perc_50 = 2160000.01;
+        $cont = 0;
+
+        $columns_barras['data'] = array('type' => 'string', 'label' => 'Metas');
+        $columns_barras['50'] = array('type' => 'number', 'label' => 'Meta 50%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras['45'] = array('type' => 'number', 'label' => 'Meta 45%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+
+        $string = array();
+
+        $column_chart_barras = new GoogleCharts();
+
+        $column_chart_barras->type('BarChart');
+
+        $column_chart_barras->options(array(
+            'width' => '50%',
+            'heigth' => '30%',
+            'title' => '',
+            'vAxis' => array('minValue' => 0),
+            'titleTextStyle' => array('color' => 'grenn'),
+            'fontSize' => 12,
+        ));
+
+        $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                    from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                   where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                     and corretors.id      = negociacaocorretors.corretor_id
+                                                     and negociacaos.id = contasrecebers.negociacao_id
+                                                     and negociacaos.id = negociacaocorretors.negociacao_id
+                                                     and dtpagamento between ' . "'" . '2021-10-01' . "'" . ' and ' . "'" . '2021-12-31' . "'" . '
+                                                   group by corretors.id, corretors.nome
+                                                   order by sum(valorparcela) desc');
+
+        $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
+        foreach ($corretors as $key => $item) :
+            $columns_barras[$item[0]['nome']] = array('type' => 'number', 'label' => $item[0]['nome']);
+            $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        endforeach;
+
+        $string['50'] = $perc_50;
+        $string[] = $perc_50;
+        $string['45'] = $perc_45;
+        $string[] = $perc_45;
+
+        $column_chart_barras->columns($columns_barras);
+
+        foreach ($corretors as $key => $corretor) :
+
+            $vgv_recebido = 0;
+
+            $negociacaos = $this->Contasreceber->query('select contasrecebers.negociacao_id, vgv_final, valorparcela, honorarios
+                                                          from contasrecebers,
+                                                               contasrecebermovs,
+                                                               negociacaos,
+                                                               negociacaocorretors
+                                                         where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                           and negociacaos.id = contasrecebers.negociacao_id
+                                                           and negociacaos.id = negociacaocorretors.negociacao_id
+                                                           and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
+                                                           and dtpagamento between ' . "'" . '2021-10-01' . "'" . ' and ' . "'" . '2021-12-31' . "'");
+
+            if (!empty($negociacaos)) {
+
+                foreach ($negociacaos as $negociacao) :
+                    $vgv_recebido = $vgv_recebido + (($negociacao[0]['vgv_final'] * $negociacao[0]['valorparcela']) / $negociacao[0]['honorarios']);
+                endforeach;
+
+                $string[$corretor[0]['nome']] = $vgv_recebido;
+                $string[] = $vgv_recebido;
+
+                $vgv_recebido_total = $vgv_recebido_total + $vgv_recebido;
+            }
+        endforeach;
+
+        $column_chart_barras->addRow($string);
+
+        $this->set(compact('column_chart_barras'));
+
+        //-------- FIM QUARTO TRIMESTRE ----------------
+    }
+
+    public function metas_acompanhamento_individual_ano() {
+
+        $meta_ano = $this->Session->read('meta_ano');
+
+        $vgv_recebido_total = 0;
+
+        //-------- PRIMEIRO TRIMESTRE ----------------
+
+        $perc_45 = 4320000.04;
+        $perc_50 = 8640000.04;
+        $cont = 0;
+
+        $columns_barras['data'] = array('type' => 'string', 'label' => 'Metas');
+        $columns_barras['50'] = array('type' => 'number', 'label' => 'Meta 50%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras['45'] = array('type' => 'number', 'label' => 'Meta 45%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+
+        $string = array();
+
+        $column_chart_barras = new GoogleCharts();
+
+        $column_chart_barras->type('BarChart');
+
+        $column_chart_barras->options(array(
+            'width' => '50%',
+            'heigth' => '30%',
+            'title' => '',
+            'vAxis' => array('minValue' => 0),
+            'titleTextStyle' => array('color' => 'grenn'),
+            'fontSize' => 12,
+        ));
+
+        $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                    from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                   where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                     and corretors.id      = negociacaocorretors.corretor_id
+                                                     and negociacaos.id = contasrecebers.negociacao_id
+                                                     and negociacaos.id = negociacaocorretors.negociacao_id
+                                                     and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-12-31' . "'" . '
+                                                   group by corretors.id, corretors.nome
+                                                   order by sum(valorparcela) desc');
+
+        $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
+        foreach ($corretors as $key => $item) :
+            $columns_barras[$item[0]['nome']] = array('type' => 'number', 'label' => $item[0]['nome']);
+            $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        endforeach;
+
+        $string['50'] = $perc_50;
+        $string[] = $perc_50;
+        $string['45'] = $perc_45;
+        $string[] = $perc_45;
+
+        $column_chart_barras->columns($columns_barras);
+
+        foreach ($corretors as $key => $corretor) :
+
+            $vgv_recebido = 0;
+
+            $negociacaos = $this->Contasreceber->query('select contasrecebers.negociacao_id, vgv_final, valorparcela, honorarios
+                                                          from contasrecebers,
+                                                               contasrecebermovs,
+                                                               negociacaos,
+                                                               negociacaocorretors
+                                                         where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                           and negociacaos.id = contasrecebers.negociacao_id
+                                                           and negociacaos.id = negociacaocorretors.negociacao_id
+                                                           and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
+                                                           and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-12-31' . "'");
+
+            if (!empty($negociacaos)) {
+
+                foreach ($negociacaos as $negociacao) :
+                    $vgv_recebido = $vgv_recebido + (($negociacao[0]['vgv_final'] * $negociacao[0]['valorparcela']) / $negociacao[0]['honorarios']);
+                endforeach;
+
+                $string[$corretor[0]['nome']] = $vgv_recebido;
+                $string[] = $vgv_recebido;
+
+                $vgv_recebido_total = $vgv_recebido_total + $vgv_recebido;
+            }
+        endforeach;
+
+        $column_chart_barras->addRow($string);
+
+        $this->set(compact('column_chart_barras'));
+    }
+
+    public function metas_acompanhamento_ano() {
+
+        $meta_ano = $this->Session->read('meta_ano');
+
+        $vgv_recebido_total = 0;
+
+        $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                    from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                   where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                     and corretors.id      = negociacaocorretors.corretor_id
+                                                     and negociacaos.id = contasrecebers.negociacao_id
+                                                     and negociacaos.id = negociacaocorretors.negociacao_id
+                                                     and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-12-31' . "'" . '
+                                                   group by corretors.id, corretors.nome
+                                                   order by sum(valorparcela) desc');
+
+
+        foreach ($corretors as $key => $corretor) :
+
+            $vgv_recebido = 0;
+
+            $negociacaos = $this->Contasreceber->query('select contasrecebers.negociacao_id, vgv_final, valorparcela, honorarios
+                                                          from contasrecebers,
+                                                               contasrecebermovs,
+                                                               negociacaos,
+                                                               negociacaocorretors
+                                                         where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                           and negociacaos.id = contasrecebers.negociacao_id
+                                                           and negociacaos.id = negociacaocorretors.negociacao_id
+                                                           and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
+                                                           and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-12-31' . "'");
+
+            if (!empty($negociacaos)) {
+
+                foreach ($negociacaos as $negociacao) :
+                    $vgv_recebido = $vgv_recebido + (($negociacao[0]['vgv_final'] * $negociacao[0]['valorparcela']) / $negociacao[0]['honorarios']);
+                endforeach;
+
+                $string[$corretor[0]['nome']] = $vgv_recebido;
+                $string[] = $vgv_recebido;
+
+                $vgv_recebido_total = $vgv_recebido_total + $vgv_recebido;
+            }
+        endforeach;
+
+        //-------- META ANUAL BARRAS ----------------
+
+        $meta_ano = 50000000;
+        $super_meta_ano = 70000000;
+
+        $columns_barras_ano['data'] = array('type' => 'string', 'label' => 'Metas');
+        $columns_barras_ano['super'] = array('type' => 'number', 'label' => 'Super Meta (2021)');
+        $columns_barras_ano[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras_ano['ano'] = array('type' => 'number', 'label' => 'Meta (2021)');
+        $columns_barras_ano[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras_ano['vgv'] = array('type' => 'number', 'label' => 'VGV recebido (2021)');
+        $columns_barras_ano[] = array('type' => 'number', 'role' => 'annotation');
+
+        $string = array();
+
+        $column_chart_barras_ano = new GoogleCharts();
+
+        $column_chart_barras_ano->type('BarChart');
+
+        $column_chart_barras_ano->options(array(
+            'width' => '50%',
+            'heigth' => '30%',
+            'title' => '',
+            'vAxis' => array('minValue' => 0),
+            'titleTextStyle' => array('color' => 'grenn'),
+            'fontSize' => 12,
+        ));
+
+        $column_chart_barras_ano->columns($columns_barras_ano);
+
+        $string['super'] = $super_meta_ano;
+        $string[] = $super_meta_ano;
+        $string['ano'] = $meta_ano;
+        $string[] = $meta_ano;
+        $string['vgv'] = $vgv_recebido_total;
+        $string[] = $vgv_recebido_total;
+
+        $column_chart_barras_ano->addRow($string);
+
+        $this->set(compact('column_chart_barras_ano'));
+
+        //-------- FIM META ANUAL ----------------
+        //
+        //
+        //-------- META ANUAL PIZZA ----------------
+
+        $piechart = new GoogleCharts();
+        $piechart->type("PieChart");
+        $piechart->options(array(
+            'width' => '80%',
+            'heigth' => '30%',
+            'titleTextStyle' => array('color' => 'blue'),
+            'fontSize' => 12));
+        $piechart->columns(array(
+            'descricao' => array(
+                'type' => 'string',
+                'label' => 'Descrição'
+            ),
+            'valor' => array(
+                'type' => 'number',
+                'label' => 'Valor',
+                'format' => '#,###',
+                'role' => 'annotation'
+            )
+        ));
+
+        $piechart->addRow(array('descricao' => 'Meta (2021)', $meta_ano, 'valor' => $meta_ano));
+        $piechart->addRow(array('descricao' => 'VGV recebido (2021)', $vgv_recebido_total, 'valor' => $vgv_recebido_total));
+
+        $this->set(compact('piechart'));
+
+        //-------- FIM META ANUAL PIZZA----------------
+        //
+        //-------- SUPER META ANUAL PIZZA ----------------
+
+        $piechart_super = new GoogleCharts();
+        $piechart_super->type("PieChart");
+        $piechart_super->options(array(
+            'width' => '80%',
+            'heigth' => '30%',
+            'titleTextStyle' => array('color' => 'blue'),
+            'fontSize' => 12));
+        $piechart_super->columns(array(
+            'descricao' => array(
+                'type' => 'string',
+                'label' => 'Descrição'
+            ),
+            'valor' => array(
+                'type' => 'number',
+                'label' => 'Valor',
+                'format' => '#,###',
+                'role' => 'annotation'
+            )
+        ));
+
+        $piechart_super->addRow(array('descricao' => 'Super Meta (2021)', $super_meta_ano, 'valor' => $super_meta_ano));
+        $piechart_super->addRow(array('descricao' => 'VGV recebido (2021)', $vgv_recebido_total, 'valor' => $vgv_recebido_total));
+
+        $this->set(compact('piechart_super'));
+
+        //-------- FIM META ANUAL PIZZA----------------
+    }
+
+    public function metas_acompanhamento_individual() {
+
+        $meta_ano = $this->Session->read('meta_ano');
+
+        $perc_45 = 1080000.01;
+        $perc_50 = 2160000.01;
+
+        $columns_barras['data'] = array('type' => 'string', 'label' => 'Metas');
+        $columns_barras['50'] = array('type' => 'number', 'label' => 'Meta 50%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras['45'] = array('type' => 'number', 'label' => 'Meta 45%');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+        $columns_barras['vgv'] = array('type' => 'number', 'label' => 'VGV Recebido');
+        $columns_barras[] = array('type' => 'number', 'role' => 'annotation');
+
+        $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                    from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                   where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                     and corretors.id      = negociacaocorretors.corretor_id
+                                                     and negociacaos.id = contasrecebers.negociacao_id
+                                                     and negociacaos.id = negociacaocorretors.negociacao_id
+                                                     and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-03-31' . "'" . '
+                                                   group by corretors.id, corretors.nome
+                                                   order by sum(valorparcela) desc');
+
+        foreach ($corretors as $key => $corretor) :
+
+            $string = array();
+
+            $column_chart_barras[$corretor[0]['id']] = new GoogleCharts();
+
+            $column_chart_barras[$corretor[0]['id']]->type('BarChart');
+
+            $column_chart_barras[$corretor[0]['id']]->options(array(
+                'width' => '80%',
+                'heigth' => '70%',
+                'title' => '',
+                'vAxis' => array('minValue' => 0),
+                'titleTextStyle' => array('color' => 'grenn'),
+                'fontSize' => 12,
+            ));
+
+            $column_chart_barras[$corretor[0]['id']]->columns($columns_barras);
+
+            $vgv_recebido = 0;
+
+            $negociacaos = $this->Contasreceber->query('select contasrecebers.negociacao_id, vgv_final, valorparcela, honorarios
+                                                          from contasrecebers,
+                                                               contasrecebermovs,
+                                                               negociacaos,
+                                                               negociacaocorretors
+                                                         where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                           and negociacaos.id = contasrecebers.negociacao_id
+                                                           and negociacaos.id = negociacaocorretors.negociacao_id
+                                                           and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
+                                                           and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-03-31' . "'");
+
+            if (!empty($negociacaos)) {
+
+                foreach ($negociacaos as $negociacao) :
+                    $vgv_recebido = $vgv_recebido + (($negociacao[0]['vgv_final'] * $negociacao[0]['valorparcela']) / $negociacao[0]['honorarios']);
+                endforeach;
+
+                $string['50'] = $perc_50;
+                $string[] = $perc_50;
+                $string['45'] = $perc_45;
+                $string[] = $perc_45;
+                $string['vgv'] = $vgv_recebido;
+                $string[] = $vgv_recebido;
+
+                $column_chart_barras[$corretor[0]['id']]->addRow($string);
+            }
+        endforeach;
+
+        $this->set(compact('column_chart_barras'));
+        $this->set('corretors', $corretors);
+        $this->set('cont', $cont);
     }
 
     public function add_parcela($contasreceber_id = null, $negociacao_id = null) {

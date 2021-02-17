@@ -291,7 +291,7 @@ class NegociacaosController extends AppController {
 
             $this->request->data['Negociacao']['honorarios'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['honorarios']));
             $this->request->data['Negociacao']['perc_fechamento'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['perc_fechamento']));
-            $this->request->data['Negociacao']['vgv_final'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['vgv_final']));
+            $this->request->data['Negociacao']['vgv_final'] = str_replace(',', '.', $this->request->data['Negociacao']['vgv_final']);
             $this->request->data['Negociacao']['dtvenda'] = substr($this->request->data['Negociacao']['dtvenda'], 6, 4) . "-" . substr($this->request->data['Negociacao']['dtvenda'], 3, 2) . "-" . substr($this->request->data['Negociacao']['dtvenda'], 0, 2);
 
             if ($this->Negociacao->save($this->request->data)) {
