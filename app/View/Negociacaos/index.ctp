@@ -48,7 +48,15 @@ echo $this->Html->link($this->Html->image("botoes/graficos.png", array("alt" => 
             <td><?php echo h($item['Negociacao']['unidade']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['endereco']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
-            <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
+            <?php if (!empty($item['Negociacao']['cliente_comprador_id'])) { ?>
+                <?php if ($item['Clientecomprador']['tipopessoa'] == 'F') { ?>
+                    <td><?php echo h($item['Clientecomprador']['nome']); ?>&nbsp;</td>
+                <?php } elseif ($item['Clientevendedor']['tipopessoa'] == 'J') { ?>
+                    <td><?php echo h($item['Clientevendedor']['razaosocial']); ?>&nbsp;</td>
+                <?php } ?>
+            <?php } else { ?>
+                <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
+            <?php } ?>
             <td><?php echo number_format($item['Negociacao']['valor_imovel'], 2, ',', '.'); ?>&nbsp;</td>
             <td><?php echo number_format($item['Negociacao']['valor_proposta'], 2, ',', '.'); ?>&nbsp;</td>
 

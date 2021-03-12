@@ -3,7 +3,7 @@
 App::uses('AppModel', 'Model');
 
 /**
- * Cliente
+ * Cliente Model
  *
  */
 class Cliente extends AppModel {
@@ -14,34 +14,63 @@ class Cliente extends AppModel {
      * @var array
      */
     public $validate = array(
-        'nome' => array(
+        'tipocliente' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
             ),
-            'maximo' => array(
-                'rule' => array('maxLength', '255'),
-                'message' => 'Máximo 255 caracteres',
-            )
+        ),
+        'cpf' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+                'allowEmpty' => true,
+            ),
+        ),
+        'cpfCliente' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+                'allowEmpty' => true,
+            ),
+        ),
+        'cnpj' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+                'allowEmpty' => true,
+            ),
+        ),
+        'cnpjCliente' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+                'allowEmpty' => true,
+            ),
+        ),
+        'razaosocial' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+                'allowEmpty' => true,
+            ),
+        ),
+        'nomefantasia' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+                'allowEmpty' => true,
+            ),
+        ),
+        'nome' => array(
+            'notempty' => array(
+                'rule' => array('notempty'),
+                'allowEmpty' => true,
+            ),
         ),
         'telefone' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
+                'allowEmpty' => true,
             ),
         ),
         'email' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
-                'message' => 'Este campo é obrigatório.',
-            ),
-        ),
-        'corretor_id' => array(
-            'corretor_id' => array(
-                'allowEmpty' => true
-            ),
-        ),
-        'user_id' => array(
-            'user_id' => array(
-                'allowEmpty' => true
+                'allowEmpty' => true,
             ),
         ),
     );
@@ -58,19 +87,6 @@ class Cliente extends AppModel {
      * hasMany associations
      */
     public $hasMany = array(
-        'Lead' => array(
-            'className' => 'Lead',
-            'foreignKey' => 'cliente_id',
-            'dependent' => true,
-            'conditions' => '',
-            'fields' => '',
-            'order' => '',
-            'limit' => '',
-            'offset' => '',
-            'exclusive' => true,
-            'finderQuery' => '',
-            'counterQuery' => ''
-        ),
     );
 
 }

@@ -115,7 +115,9 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Contasreceber.id', 'Negociacao.cliente_vendedor', 'Negociacao.nota_corretor', 'Negociacao.nota_imobiliaria', 'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Corretor.nome'),
+            'fields' => array('DISTINCT Negociacao.id', 'Contasreceber.id', 'Negociacao.cliente_vendedor', 'Negociacao.nota_corretor', 'Negociacao.nota_imobiliaria',
+                'Negociacao.cliente_comprador', 'Negociacao.endereco', 'Negociacao.referencia', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Corretor.nome',
+                'Negociacao.cliente_comprador_id', 'Clientecomprador.tipopessoa', 'Clientecomprador.nome', 'Clientecomprador.cpf', 'Clientecomprador.razaosocial', 'Clientecomprador.cnpj', 'Negociacao.cliente_vendedor_id', 'Clientevendedor.tipopessoa', 'Clientevendedor.razaosocial', 'Clientevendedor.cnpj'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -135,9 +137,26 @@ class ContasrecebersController extends AppController {
                     'type' => 'INNER',
                     'conditions' => array('Corretor.id = Negociacaocorretor.corretor_id')
                 ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientecomprador',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientecomprador.id = Negociacao.cliente_comprador_id',
+                    ],
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientevendedor',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientevendedor.id = Negociacao.cliente_vendedor_id',
+                    ],
+                ),
             ),
             'limit' => 20,
-            'group' => 'Negociacao.id, Contasreceber.id, Negociacao.cliente_vendedor, Negociacao.cliente_comprador, Negociacao.endereco, Negociacao.referencia, Contasreceber.status, Contasreceber.parcelas, Contasreceber.valor_total, Corretor.nome',
+            'group' => 'Negociacao.id, Contasreceber.id, Negociacao.cliente_vendedor, Negociacao.cliente_comprador, Negociacao.endereco, Negociacao.referencia,
+                Contasreceber.status, Contasreceber.parcelas, Contasreceber.valor_total, Corretor.nome, Negociacao.cliente_comprador_id, Clientecomprador.tipopessoa, Clientecomprador.nome, Clientecomprador.cpf, Clientecomprador.razaosocial, Clientecomprador.cnpj, Negociacao.cliente_vendedor_id, Clientevendedor.tipopessoa, Clientevendedor.razaosocial, Clientevendedor.cnpj',
             'order' => array('Contasreceber.id' => 'asc')
         );
 
@@ -206,7 +225,8 @@ class ContasrecebersController extends AppController {
         $this->Paginator->settings = array(
             'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.referencia', 'Negociacao.unidade', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
                 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao'),
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao',
+                'Negociacao.cliente_comprador_id', 'Clientecomprador.tipopessoa', 'Clientecomprador.nome', 'Clientecomprador.cpf', 'Clientecomprador.razaosocial', 'Clientecomprador.cnpj', 'Negociacao.cliente_vendedor_id', 'Clientevendedor.tipopessoa', 'Clientevendedor.razaosocial', 'Clientevendedor.cnpj'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -226,9 +246,91 @@ class ContasrecebersController extends AppController {
                     'type' => 'LEFT',
                     'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
                 ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientecomprador',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientecomprador.id = Negociacao.cliente_comprador_id',
+                    ],
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientevendedor',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientevendedor.id = Negociacao.cliente_vendedor_id',
+                    ],
+                ),
             ),
             'limit' => '',
             'conditions' => $conditions_filtro,
+            'order' => 'Corretor.nome asc, Negociacao.cliente_vendedor asc, Contasrecebermov.dtvencimento asc',
+        );
+
+        $this->set('contasrecebers', $this->paginate());
+    }
+
+    /**
+     * relatorio_contas_receber method
+     */
+    public function relatorio_contas_receber_contador($param = null) {
+
+        $conditions_filtro = $this->Session->read('conditions_filtro');
+
+        if (!empty($param)) {
+            $conditions_filtro = 'Contasreceber.id = ' . $param;
+        }
+
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
+
+        $this->Contasreceber->recursive = 0;
+        $this->Paginator->settings = array(
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.referencia', 'Negociacao.valor_imovel', 'Negociacao.unidade', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
+                'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao',
+                'Negociacao.cliente_comprador_id', 'Clientecomprador.tipopessoa', 'Clientecomprador.nome', 'Clientecomprador.cpf', 'Clientecomprador.razaosocial', 'Clientecomprador.cnpj', 'Negociacao.cliente_vendedor_id', 'Clientevendedor.tipopessoa', 'Clientevendedor.razaosocial', 'Clientevendedor.cnpj'),
+            'joins' => array(
+                array(
+                    'table' => 'contasrecebermovs',
+                    'alias' => 'Contasrecebermov',
+                    'type' => 'LEFT',
+                    'conditions' => array('Contasreceber.id = Contasrecebermov.contasreceber_id')
+                ),
+                array(
+                    'table' => 'negociacaocorretors',
+                    'alias' => 'Negociacaocorretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.negociacao_id = Negociacao.id')
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretor',
+                    'type' => 'LEFT',
+                    'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientecomprador',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientecomprador.id = Negociacao.cliente_comprador_id',
+                    ],
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientevendedor',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientevendedor.id = Negociacao.cliente_vendedor_id',
+                    ],
+                ),
+            ),
+            'limit' => '',
+            'conditions' => $conditions_filtro, 'Contasrecebermov.dtpagamento is not null',
             'order' => 'Corretor.nome asc, Negociacao.cliente_vendedor asc, Contasrecebermov.dtvencimento asc',
         );
 
@@ -253,9 +355,10 @@ class ContasrecebersController extends AppController {
 
         $this->Contasreceber->recursive = 0;
         $this->Paginator->settings = array(
-            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
+            'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.nota_imobiliaria', 'Negociacao.referencia', 'Negociacao.unidade', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
                 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao'),
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao',
+                'Negociacao.cliente_comprador_id', 'Clientecomprador.tipopessoa', 'Clientecomprador.nome', 'Clientecomprador.cpf', 'Negociacao.cliente_vendedor_id', 'Clientevendedor.tipopessoa', 'Clientevendedor.razaosocial', 'Clientevendedor.cnpj'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -274,6 +377,22 @@ class ContasrecebersController extends AppController {
                     'alias' => 'Corretor',
                     'type' => 'LEFT',
                     'conditions' => array('Negociacaocorretor.corretor_id = Corretor.id')
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientecomprador',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientecomprador.id = Negociacao.cliente_comprador_id',
+                    ],
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientevendedor',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientevendedor.id = Negociacao.cliente_vendedor_id',
+                    ],
                 ),
             ),
             'limit' => '',
@@ -300,7 +419,8 @@ class ContasrecebersController extends AppController {
         $this->Paginator->settings = array(
             'fields' => array('DISTINCT Negociacao.id', 'Negociacao.cliente_vendedor', 'Negociacao.id', 'Negociacao.cliente_comprador', 'Negociacao.referencia', 'Negociacao.unidade', 'Negociacao.nota_imobiliaria', 'Negociacao.nota_corretor', 'Contasreceber.negociacao_id',
                 'Negociacao.corretor_agenciador_id', 'Contasreceber.status', 'Contasreceber.parcelas', 'Contasreceber.valor_total', 'Contasrecebermov.id', 'Contasrecebermov.contasreceber_id',
-                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao', 'Corretoragenciador.nome'),
+                'Contasrecebermov.valorparcela', 'Contasrecebermov.dtvencimento', 'Contasrecebermov.dtpagamento', 'Negociacaocorretor.corretor_id', 'Corretor.id', 'Corretor.nome', 'Corretor.perc_comissao', 'Corretoragenciador.nome',
+                'Negociacao.cliente_comprador_id', 'Clientecomprador.tipopessoa', 'Clientecomprador.razaosocial', 'Clientecomprador.nome', 'Clientecomprador.cpf', 'Negociacao.cliente_vendedor_id', 'Clientevendedor.tipopessoa', 'Clientevendedor.razaosocial', 'Clientevendedor.cnpj'),
             'joins' => array(
                 array(
                     'table' => 'contasrecebermovs',
@@ -325,6 +445,22 @@ class ContasrecebersController extends AppController {
                     'alias' => 'Corretoragenciador',
                     'type' => 'LEFT',
                     'conditions' => array('Negociacao.corretor_agenciador_id = Corretoragenciador.id')
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientecomprador',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientecomprador.id = Negociacao.cliente_comprador_id',
+                    ],
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientevendedor',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientevendedor.id = Negociacao.cliente_vendedor_id',
+                    ],
                 ),
             ),
             'limit' => '',
@@ -694,8 +830,18 @@ class ContasrecebersController extends AppController {
         $tipos = array('1' => '1º TRIMESTRE', '2' => '2º TRIMESTRE', '3' => '3º TRIMESTRE', '4' => '4º TRIMESTRE', 'I' => 'META ANO - INDIVIDUAL', 'A' => 'META ANO - IMOBILIÁRIA');
         $this->set('tipos', $tipos);
 
+        $this->loadModel('Corretor');
+
+        $corretors = $this->Corretor->find('list', array(
+            'fields' => array('id', 'nome'),
+            'conditions' => array('ativo' => 'S'),
+            'order' => array('nome' => 'asc')
+        ));
+        $this->set('corretors', $corretors);
+
         if ($this->request->is('post') || $this->request->is('put')) {
             CakeSession::write('meta_ano', $this->request->data['Relatorio']['ano']);
+            CakeSession::write('meta_corretor', $this->request->data['Relatorio']['corretor']);
             if ($this->request->data['Relatorio']['tipo'] == '1') {
                 $this->redirect(array('action' => 'metas_acompanhamento_primeiro'));
             } elseif ($this->request->data['Relatorio']['tipo'] == '2') {
@@ -715,8 +861,18 @@ class ContasrecebersController extends AppController {
     public function metas_acompanhamento_primeiro() {
 
         $meta_ano = $this->Session->read('meta_ano');
+        $meta_corretor = $this->Session->read('meta_corretor');
+        $corretors_aux = '';
 
         $vgv_recebido_total = 0;
+
+        foreach ($meta_corretor as $key => $item):
+            if (empty($corretors_aux)) {
+                $corretors_aux = $item;
+            } else {
+                $corretors_aux .=',' . $item;
+            }
+        endforeach;
 
         //-------- PRIMEIRO TRIMESTRE ----------------
 
@@ -738,22 +894,35 @@ class ContasrecebersController extends AppController {
 
         $column_chart_barras->options(array(
             'width' => '50%',
-            'height' => '25%',
-            'title' => '',
+            'height' => '20%',
+            'title' => '1º Trimestre',
             'vAxis' => array('minValue' => 0),
             'titleTextStyle' => array('color' => 'grenn'),
             'fontSize' => 12,
         ));
 
-        $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
-                                                    from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
-                                                   where contasrecebers.id = contasrecebermovs.contasreceber_id
-                                                     and corretors.id      = negociacaocorretors.corretor_id
-                                                     and negociacaos.id = contasrecebers.negociacao_id
-                                                     and negociacaos.id = negociacaocorretors.negociacao_id
-                                                     and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-03-31' . "'" . '
-                                                   group by corretors.id, corretors.nome
-                                                   order by sum(valorparcela) desc');
+        if (!empty($corretors_aux)) {
+            $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                        from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                       where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                         and corretors.id      = negociacaocorretors.corretor_id
+                                                         and negociacaos.id = contasrecebers.negociacao_id
+                                                         and negociacaos.id = negociacaocorretors.negociacao_id
+                                                         and corretors.id in (' . $corretors_aux . ')
+                                                         and dtpagamento between ' . "'" . $meta_ano . '-01-01' . "'" . ' and ' . "'" . $meta_ano . '-03-31' . "'" . '
+                                                       group by corretors.id, corretors.nome
+                                                       order by sum(valorparcela) desc');
+        } else {
+            $corretors = $this->Contasreceber->query('select distinct corretors.id, corretors.nome, sum(valorparcela)
+                                                        from corretors, contasrecebers, contasrecebermovs, negociacaos, negociacaocorretors
+                                                       where contasrecebers.id = contasrecebermovs.contasreceber_id
+                                                         and corretors.id      = negociacaocorretors.corretor_id
+                                                         and negociacaos.id = contasrecebers.negociacao_id
+                                                         and negociacaos.id = negociacaocorretors.negociacao_id
+                                                         and dtpagamento between ' . "'" . $meta_ano . '-01-01' . "'" . ' and ' . "'" . $meta_ano . '-03-31' . "'" . '
+                                                       group by corretors.id, corretors.nome
+                                                       order by sum(valorparcela) desc');
+        }
 
         $columns_linha['data'] = array('type' => 'string', 'label' => 'Data');
         foreach ($corretors as $key => $item) :
@@ -781,7 +950,7 @@ class ContasrecebersController extends AppController {
                                                            and negociacaos.id = contasrecebers.negociacao_id
                                                            and negociacaos.id = negociacaocorretors.negociacao_id
                                                            and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
-                                                           and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-03-31' . "'");
+                                                           and dtpagamento between ' . "'" . $meta_ano . '-01-01' . "'" . ' and ' . "'" . $meta_ano . '-03-31' . "'");
 
             if (!empty($negociacaos)) {
 
@@ -830,7 +999,7 @@ class ContasrecebersController extends AppController {
         $column_chart_barras->options(array(
             'width' => '50%',
             'heigth' => '30%',
-            'title' => '',
+            'title' => '2º Trimestre',
             'vAxis' => array('minValue' => 0),
             'titleTextStyle' => array('color' => 'grenn'),
             'fontSize' => 12,
@@ -842,7 +1011,7 @@ class ContasrecebersController extends AppController {
                                                      and corretors.id      = negociacaocorretors.corretor_id
                                                      and negociacaos.id = contasrecebers.negociacao_id
                                                      and negociacaos.id = negociacaocorretors.negociacao_id
-                                                     and dtpagamento between ' . "'" . '2021-04-01' . "'" . ' and ' . "'" . '2021-06-30' . "'" . '
+                                                     and dtpagamento between ' . "'" . $meta_ano . '-04-01' . "'" . ' and ' . "'" . $meta_ano . '-06-30' . "'" . '
                                                    group by corretors.id, corretors.nome
                                                    order by sum(valorparcela) desc');
 
@@ -872,7 +1041,7 @@ class ContasrecebersController extends AppController {
                                                            and negociacaos.id = contasrecebers.negociacao_id
                                                            and negociacaos.id = negociacaocorretors.negociacao_id
                                                            and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
-                                                           and dtpagamento between ' . "'" . '2021-04-01' . "'" . ' and ' . "'" . '2021-06-30' . "'");
+                                                           and dtpagamento between ' . "'" . $meta_ano . '-04-01' . "'" . ' and ' . "'" . $meta_ano . '-06-30' . "'");
 
             if (!empty($negociacaos)) {
 
@@ -921,7 +1090,7 @@ class ContasrecebersController extends AppController {
         $column_chart_barras->options(array(
             'width' => '50%',
             'heigth' => '30%',
-            'title' => '',
+            'title' => '3º Trimestre',
             'vAxis' => array('minValue' => 0),
             'titleTextStyle' => array('color' => 'grenn'),
             'fontSize' => 12,
@@ -933,7 +1102,7 @@ class ContasrecebersController extends AppController {
                                                      and corretors.id      = negociacaocorretors.corretor_id
                                                      and negociacaos.id = contasrecebers.negociacao_id
                                                      and negociacaos.id = negociacaocorretors.negociacao_id
-                                                     and dtpagamento between ' . "'" . '2021-07-01' . "'" . ' and ' . "'" . '2021-09-30' . "'" . '
+                                                     and dtpagamento between ' . "'" . $meta_ano . '-07-01' . "'" . ' and ' . "'" . $meta_ano . '-09-30' . "'" . '
                                                    group by corretors.id, corretors.nome
                                                    order by sum(valorparcela) desc');
 
@@ -963,7 +1132,7 @@ class ContasrecebersController extends AppController {
                                                            and negociacaos.id = contasrecebers.negociacao_id
                                                            and negociacaos.id = negociacaocorretors.negociacao_id
                                                            and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
-                                                           and dtpagamento between ' . "'" . '2021-07-01' . "'" . ' and ' . "'" . '2021-09-30' . "'");
+                                                           and dtpagamento between ' . "'" . $meta_ano . '-07-01' . "'" . ' and ' . "'" . $meta_ano . '-09-30' . "'");
 
             if (!empty($negociacaos)) {
 
@@ -1012,7 +1181,7 @@ class ContasrecebersController extends AppController {
         $column_chart_barras->options(array(
             'width' => '50%',
             'heigth' => '30%',
-            'title' => '',
+            'title' => '4º Trimestre',
             'vAxis' => array('minValue' => 0),
             'titleTextStyle' => array('color' => 'grenn'),
             'fontSize' => 12,
@@ -1024,7 +1193,7 @@ class ContasrecebersController extends AppController {
                                                      and corretors.id      = negociacaocorretors.corretor_id
                                                      and negociacaos.id = contasrecebers.negociacao_id
                                                      and negociacaos.id = negociacaocorretors.negociacao_id
-                                                     and dtpagamento between ' . "'" . '2021-10-01' . "'" . ' and ' . "'" . '2021-12-31' . "'" . '
+                                                     and dtpagamento between ' . "'" . $meta_ano . '-10-01' . "'" . ' and ' . "'" . $meta_ano . '-12-31' . "'" . '
                                                    group by corretors.id, corretors.nome
                                                    order by sum(valorparcela) desc');
 
@@ -1054,7 +1223,7 @@ class ContasrecebersController extends AppController {
                                                            and negociacaos.id = contasrecebers.negociacao_id
                                                            and negociacaos.id = negociacaocorretors.negociacao_id
                                                            and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
-                                                           and dtpagamento between ' . "'" . '2021-10-01' . "'" . ' and ' . "'" . '2021-12-31' . "'");
+                                                           and dtpagamento between ' . "'" . $meta_ano . '-10-01' . "'" . ' and ' . "'" . $meta_ano . '-12-31' . "'");
 
             if (!empty($negociacaos)) {
 
@@ -1082,8 +1251,6 @@ class ContasrecebersController extends AppController {
 
         $vgv_recebido_total = 0;
 
-        //-------- PRIMEIRO TRIMESTRE ----------------
-
         $perc_45 = 4320000.04;
         $perc_50 = 8640000.04;
         $cont = 0;
@@ -1103,7 +1270,7 @@ class ContasrecebersController extends AppController {
         $column_chart_barras->options(array(
             'width' => '50%',
             'heigth' => '30%',
-            'title' => '',
+            'title' => 'Meta Individual/Ano',
             'vAxis' => array('minValue' => 0),
             'titleTextStyle' => array('color' => 'grenn'),
             'fontSize' => 12,
@@ -1115,7 +1282,7 @@ class ContasrecebersController extends AppController {
                                                      and corretors.id      = negociacaocorretors.corretor_id
                                                      and negociacaos.id = contasrecebers.negociacao_id
                                                      and negociacaos.id = negociacaocorretors.negociacao_id
-                                                     and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-12-31' . "'" . '
+                                                     and dtpagamento between ' . "'" . $meta_ano . '-01-01' . "'" . ' and ' . "'" . $meta_ano . '-12-31' . "'" . '
                                                    group by corretors.id, corretors.nome
                                                    order by sum(valorparcela) desc');
 
@@ -1145,7 +1312,7 @@ class ContasrecebersController extends AppController {
                                                            and negociacaos.id = contasrecebers.negociacao_id
                                                            and negociacaos.id = negociacaocorretors.negociacao_id
                                                            and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
-                                                           and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-12-31' . "'");
+                                                           and dtpagamento between ' . "'" . $meta_ano . '-01-01' . "'" . ' and ' . "'" . $meta_ano . '-12-31' . "'");
 
             if (!empty($negociacaos)) {
 
@@ -1177,7 +1344,7 @@ class ContasrecebersController extends AppController {
                                                      and corretors.id      = negociacaocorretors.corretor_id
                                                      and negociacaos.id = contasrecebers.negociacao_id
                                                      and negociacaos.id = negociacaocorretors.negociacao_id
-                                                     and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-12-31' . "'" . '
+                                                     and dtpagamento between ' . "'" . $meta_ano . '-01-01' . "'" . ' and ' . "'" . $meta_ano . '-12-31' . "'" . '
                                                    group by corretors.id, corretors.nome
                                                    order by sum(valorparcela) desc');
 
@@ -1195,7 +1362,7 @@ class ContasrecebersController extends AppController {
                                                            and negociacaos.id = contasrecebers.negociacao_id
                                                            and negociacaos.id = negociacaocorretors.negociacao_id
                                                            and negociacaocorretors.corretor_id = ' . $corretor[0]['id'] . '
-                                                           and dtpagamento between ' . "'" . '2021-01-01' . "'" . ' and ' . "'" . '2021-12-31' . "'");
+                                                           and dtpagamento between ' . "'" . $meta_ano . '-01-01' . "'" . ' and ' . "'" . $meta_ano . '-12-31' . "'");
 
             if (!empty($negociacaos)) {
 
@@ -1232,7 +1399,7 @@ class ContasrecebersController extends AppController {
         $column_chart_barras_ano->options(array(
             'width' => '50%',
             'heigth' => '30%',
-            'title' => '',
+            'title' => 'Meta Ano/Super meta',
             'vAxis' => array('minValue' => 0),
             'titleTextStyle' => array('color' => 'grenn'),
             'fontSize' => 12,
@@ -1261,6 +1428,7 @@ class ContasrecebersController extends AppController {
         $piechart->options(array(
             'width' => '80%',
             'heigth' => '30%',
+            'title' => '-',
             'titleTextStyle' => array('color' => 'blue'),
             'fontSize' => 12));
         $piechart->columns(array(
@@ -1290,6 +1458,7 @@ class ContasrecebersController extends AppController {
         $piechart_super->options(array(
             'width' => '80%',
             'heigth' => '30%',
+            'title' => '-',
             'titleTextStyle' => array('color' => 'blue'),
             'fontSize' => 12));
         $piechart_super->columns(array(

@@ -19,50 +19,34 @@ class ClientesController extends AppController {
         return parent::isAuthorized($user);
     }
 
-    public $components = array('Paginator');
-
     /**
      * index method
      */
-    public function index($negociacao = null) {
+    public function index() {
 
-//        if (empty($negociacao)) {
-//            $negociacao = $negociacao;
-//        }
+        $this->loadModel('Origen');
+        $origens = $this->Origen->find('list', array('fields' => array('id', 'descricao'),
+            'order' => array('descricao')));
+        $this->set('origens', $origens);
 
-        $this->set('negociacao', $negociacao);
-
-        $dadosUser = $this->Session->read();
-        $this->set('dadosUser', $dadosUser);
-
-        $tipopessoa = array('F' => 'Física', 'J' => 'Jurídica');
+        $this->loadModel('Corretor');
+        $corretors = $this->Corretor->find('list', array('fields' => array('id', 'nome'),
+            'order' => array('nome')));
+        $this->set('corretors', $corretors);
 
         $this->Filter->addFilters(
                 array(
                     'filter1' => array(
-                        'Cliente.tipopessoa' => array(
-                            'select' => $tipopessoa
+                        'Origen.id' => array(
+                            'select' => $origens
                         ),
                     ),
                     'filter2' => array(
-                        'Cliente.razaosocial' => array(
-                            'operator' => 'ILIKE',
-                            'value' => array(
-                                'before' => '%',
-                                'after' => '%'
-                            )
-                        )
+                        'Corretor.id' => array(
+                            'select' => $corretors
+                        ),
                     ),
                     'filter3' => array(
-                        'Cliente.nomefantasia' => array(
-                            'operator' => 'ILIKE',
-                            'value' => array(
-                                'before' => '%',
-                                'after' => '%'
-                            )
-                        )
-                    ),
-                    'filter4' => array(
                         'Cliente.nome' => array(
                             'operator' => 'ILIKE',
                             'value' => array(
@@ -71,21 +55,65 @@ class ClientesController extends AppController {
                             )
                         )
                     ),
-                    'filter5' => array(
-                        'Cliente.cpf' => array(
+                    'filter4' => array(
+                        'Cliente.email' => array(
                             'operator' => 'ILIKE',
                             'value' => array(
                                 'before' => '%',
                                 'after' => '%'
                             )
                         )
-                    )
+                    ),
+                    'filter5' => array(
+                        'Cliente.telefone' => array(
+                            'operator' => 'ILIKE',
+                            'value' => array(
+                                'before' => '%',
+                                'after' => '%'
+                            )
+                        )
+                    ),
                 )
         );
 
         $this->Cliente->recursive = 0;
-
-        $this->Paginator->settings = array('Cliente.nome' => 'asc');
+        $this->Paginator->settings = array(
+            'joins' => array(
+                array(
+                    'table' => 'leads',
+                    'alias' => 'Lead',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Cliente.id = Lead.cliente_id',
+                    ],
+                ),
+                array(
+                    'table' => 'importacaoleads',
+                    'alias' => 'Importacaolead',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Importacaolead.id = Lead.importacaolead_id',
+                    ],
+                ),
+                array(
+                    'table' => 'origens',
+                    'alias' => 'Origen',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Importacaolead.origen_id = Origen.id',
+                    ],
+                ),
+                array(
+                    'table' => 'corretors',
+                    'alias' => 'Corretor',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Lead.corretor_id = Corretor.id',
+                    ],
+                ),
+            ),
+            'order' => array('nome' => 'asc')
+        );
 
         $this->Filter->setPaginate('conditions', array($this->Filter->getConditions()));
 
@@ -97,19 +125,17 @@ class ClientesController extends AppController {
      */
     public function view($id = null) {
 
-        $dadosUser = $this->Session->read();
-
         $this->Cliente->id = $id;
         if (!$this->Cliente->exists()) {
             $this->Session->setFlash('Registro não encontrado.', 'default', array('class' => 'mensagem_erro'));
             $this->redirect(array('action' => 'index'));
         }
 
-        $this->Cliente->recursive = 1;
+        $this->Cliente->recursive = 0;
 
-        $cliente = $this->Cliente->read(null, $id);
+        $clientes = $this->Cliente->read(null, $id);
 
-        $this->set('cliente', $cliente);
+        $this->set('clientes', $clientes);
     }
 
     /**
@@ -117,35 +143,9 @@ class ClientesController extends AppController {
      */
     public function add() {
 
-        $loja_id = '';
-        $users = array();
-
-        $dadosUser = $this->Session->read();
-
-        $tipopessoa = array('F' => 'Física', 'J' => 'Jurídica');
-
-        $this->set('tipopessoa', $tipopessoa);
-
         if ($this->request->is('post')) {
-
-            if ($this->request->data['Cliente']['tipopessoa'] == 'F') {
-                if ((empty($this->request->data['Cliente']['cpfCliente'])) or (empty($this->request->data['Cliente']['nome']))) {
-                    $this->Session->setFlash('CPF, nome e sobrenome do cliente são obrigatórios.', 'default', array('class' => 'mensagem_erro'));
-                    return;
-                }
-            }
-
-            if ($this->request->data['Cliente']['tipopessoa'] == 'J') {
-                if ((empty($this->request->data['Cliente']['cnpjCliente'])) or (empty($this->request->data['Cliente']['razaosocial']))) {
-                    $this->Session->setFlash('CNPJ e Razão Social do cliente são obrigatórios.', 'default', array('class' => 'mensagem_erro'));
-                    return;
-                }
-            }
-
-            $separadores = array(".", "-", "/", "(", ")");
-            $this->request->data['Cliente']['cnpj'] = str_replace($separadores, '', $this->request->data['Cliente']['cnpjCliente']);
-            $this->request->data['Cliente']['cpf'] = str_replace($separadores, '', $this->request->data['Cliente']['cpfCliente']);
-            $this->request->data['Cliente']['telefone'] = str_replace($separadores, '', $this->request->data['Cliente']['telefoneCliente']);
+            $separadores = array(".", "-", "/");
+            $this->request->data['Cliente']['cpf'] = str_replace($separadores, '', $this->request->data['Cliente']['cpf']);
             $this->Cliente->create();
             if ($this->Cliente->save($this->request->data)) {
                 $this->Session->setFlash('Cliente adicionado com sucesso!', 'default', array('class' => 'mensagem_sucesso'));
@@ -167,26 +167,20 @@ class ClientesController extends AppController {
             $this->redirect(array('action' => 'index'));
         }
 
-        $this->Cliente->recursive = 1;
         $cliente = $this->Cliente->read(null, $id);
 
-        $tipopessoa = array('F' => 'Física', 'J' => 'Jurídica');
-
-        $this->set('tipopessoa', $tipopessoa);
-
         if ($this->request->is('post') || $this->request->is('put')) {
-            $separadores = array(".", "-", "/", "(", ")");
-            $this->request->data['Cliente']['cnpj'] = str_replace($separadores, '', $this->request->data['Cliente']['cnpjCliente']);
-            $this->request->data['Cliente']['cpf'] = str_replace($separadores, '', $this->request->data['Cliente']['cpfCliente']);
-            $this->request->data['Cliente']['telefone'] = str_replace($separadores, '', $this->request->data['Cliente']['telefoneCliente']);
+            $separadores = array(".", "-", "/");
+            $this->request->data['Cliente']['cpf'] = str_replace($separadores, '', $this->request->data['Cliente']['cpf']);
             if ($this->Cliente->save($this->request->data)) {
-                $this->Session->setFlash('Cliente alterada com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
+                $this->Session->setFlash('Cliente alterado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
                 $this->redirect(array('action' => 'index'));
             } else {
                 $this->Session->setFlash('Registro não foi alterado. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
         } else {
             $this->request->data = $cliente;
+            debug($cliente);
         }
     }
 
@@ -195,8 +189,6 @@ class ClientesController extends AppController {
      */
     public function delete($id = null) {
 
-        $dadosUser = $this->Session->read();
-
         $this->Cliente->id = $id;
         if (!$this->Cliente->exists()) {
             $this->Session->setFlash('Registro não encontrado.', 'default', array('class' => 'mensagem_erro'));
@@ -204,7 +196,7 @@ class ClientesController extends AppController {
         }
 
         if ($this->Cliente->delete()) {
-            $this->Session->setFlash('Cliente deletado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
+            $this->Session->setFlash('Mídia de referência deletada com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
             $this->redirect(array('action' => 'index'));
         }
         $this->Session->setFlash('Registro não foi deletado.', 'default', array('class' => 'mensagem_erro'));
@@ -212,4 +204,3 @@ class ClientesController extends AppController {
     }
 
 }
-

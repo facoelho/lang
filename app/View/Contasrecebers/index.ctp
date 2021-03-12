@@ -1,4 +1,5 @@
 <?php
+echo $this->Html->link($this->Html->image("botoes/nfe.png", array("alt" => "Imprimir relatório contador", "title" => "Imprimir relatório contador")), array('action' => 'relatorio_contas_receber_contador'), array('escape' => false, 'target' => '_blank'));
 echo $this->Html->link($this->Html->image("botoes/printer.png", array("alt" => "Imprimir", "title" => "Imprimir")), array('action' => 'relatorio_contas_receber'), array('escape' => false, 'target' => '_blank'));
 echo $this->Html->link($this->Html->image("botoes/cifrao_2.png", array("alt" => "Imprimir", "title" => "Imprimir")), array('action' => 'relatorio_comissoes'), array('escape' => false, 'target' => '_blank'));
 echo $this->Html->link($this->Html->image("botoes/ranking.jpg", array("alt" => "Ranking", "title" => "Ranking")), array('action' => 'relatorio_ranking'), array('escape' => false, 'target' => '_blank'));
@@ -52,8 +53,29 @@ echo $this->Html->link($this->Html->image("botoes/ranking.jpg", array("alt" => "
             <td><?php echo h($item['Contasreceber']['id']); ?>&nbsp;</td>
             <td><?php echo h($item['Negociacao']['id']); ?>&nbsp;</td>
             <td><?php echo h($item['Corretor']['nome']); ?>&nbsp;</td>
-            <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
-            <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
+
+            <?php //Cliente vendedor ?>
+            <?php if (!empty($item['Negociacao']['cliente_vendedor_id'])) { ?>
+                <?php if ($item['Clientevendedor']['tipopessoa'] == 'F') { ?>
+                    <td><?php echo h($item['Clientevendedor']['nome']); ?>&nbsp;</td>
+                <?php } elseif ($item['Clientevendedor']['tipopessoa'] == 'J') { ?>
+                    <td><?php echo h($item['Clientevendedor']['razaosocial']); ?>&nbsp;</td>
+                <?php } ?>
+            <?php } else { ?>
+                <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
+            <?php } ?>
+
+            <?php //Cliente comprador ?>
+            <?php if (!empty($item['Negociacao']['cliente_comprador_id'])) { ?>
+                <?php if ($item['Clientecomprador']['tipopessoa'] == 'F') { ?>
+                    <td><?php echo h($item['Clientecomprador']['nome']); ?>&nbsp;</td>
+                <?php } elseif ($item['Clientecomprador']['tipopessoa'] == 'J') { ?>
+                    <td><?php echo h($item['Clientecomprador']['razaosocial']); ?>&nbsp;</td>
+                <?php } ?>
+            <?php } else { ?>
+                <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
+            <?php } ?>
+
             <td><?php echo h($item['Negociacao']['endereco'] . ' - ' . $item['Negociacao']['referencia']); ?>&nbsp;</td>
             <?php if ($item['Negociacao']['nota_imobiliaria'] == 'S') { ?>
                 <td><strong><font color="red"><?php echo h($item['Negociacao']['nota_imobiliaria']); ?>&nbsp;</font></strong></td>

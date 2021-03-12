@@ -31,16 +31,23 @@ class Negociacao extends AppModel {
                 'rule' => array('notempty'),
             ),
         ),
-        'cliente_comprador' => array(
+//        'cliente_comprador' => array(
+//            'notempty' => array(
+//                'rule' => 'notEmpty',
+//                'allowEmpty' => true,
+//                'last' => false
+//            ),
+//        ),
+        'cliente_id' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
             ),
         ),
-        'cliente_vendedor' => array(
-            'notempty' => array(
-                'rule' => array('notempty'),
-            ),
-        ),
+//        'cliente_vendedor' => array(
+//            'notempty' => array(
+//                'rule' => array('notempty'),
+//            ),
+//        ),
         'valor_imovel' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
@@ -98,6 +105,13 @@ class Negociacao extends AppModel {
             'fields' => '',
             'order' => ''
         ),
+//        'Cliente' => array(
+//            'className' => 'Cliente',
+//            'foreignKey' => 'cliente_id',
+//            'conditions' => '',
+//            'fields' => '',
+//            'order' => ''
+//        ),
     );
 
     /**

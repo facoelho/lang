@@ -21,6 +21,8 @@ class NegociacaosController extends AppController {
     public function index() {
 
         $dadosUser = $this->Session->read();
+        CakeSession::write('cliente_vendedor_id', '');
+        CakeSession::write('cliente_comprador_id', '');
 
         $conditions = array();
         $filter_status = '';
@@ -104,7 +106,8 @@ class NegociacaosController extends AppController {
 
         $this->Paginator->settings = array(
             'fields' => array('DISTINCT Negociacao.id', 'Negociacao.dtalerta', 'Negociacao.referencia', 'Negociacao.unidade', 'Negociacao.endereco', 'Negociacao.cliente_vendedor',
-                'Negociacao.cliente_comprador', 'Negociacao.valor_imovel', 'Negociacao.valor_proposta', 'Negociacao.status', 'Negociacao.dt_ultima_etapa'),
+                'Negociacao.cliente_comprador', 'Negociacao.valor_imovel', 'Negociacao.valor_proposta', 'Negociacao.status', 'Negociacao.dt_ultima_etapa',
+                'Negociacao.cliente_comprador_id', 'Clientecomprador.tipopessoa', 'Clientecomprador.nome', 'Clientecomprador.cpf', 'Negociacao.cliente_vendedor_id', 'Clientevendedor.tipopessoa', 'Clientevendedor.razaosocial', 'Clientevendedor.cnpj'),
             'joins' => array(
                 array(
                     'table' => 'negociacaocorretors',
@@ -112,6 +115,22 @@ class NegociacaosController extends AppController {
                     'type' => 'INNER',
                     'conditions' => [
                         'Negociacaocorretor.negociacao_id = Negociacao.id',
+                    ],
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientecomprador',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientecomprador.id = Negociacao.cliente_comprador_id',
+                    ],
+                ),
+                array(
+                    'table' => 'clientes',
+                    'alias' => 'Clientevendedor',
+                    'type' => 'LEFT',
+                    'conditions' => [
+                        'Clientevendedor.id = Negociacao.cliente_vendedor_id',
                     ],
                 ),
             ),
@@ -146,9 +165,14 @@ class NegociacaosController extends AppController {
     /**
      * add method
      */
-    public function add() {
+    public function add($cliente_id = null, $tipo = null) {
 
         $dadosUser = $this->Session->read();
+        $cliente_vendedor_id = $this->Session->read('cliente_vendedor_id');
+        $cliente_comprador_id = $this->Session->read('cliente_comprador_id');
+
+        $this->set('cliente_vendedor_id', $cliente_vendedor_id);
+        $this->set('cliente_comprador_id', $cliente_comprador_id);
 
         $this->loadModel('Corretor');
 
@@ -161,6 +185,75 @@ class NegociacaosController extends AppController {
 
         $status = array('E' => 'EM ANDAMENTO');
         $this->set('status', $status);
+
+        debug($tipo);
+        debug($cliente_vendedor_id);
+        debug($cliente_comprador_id);
+
+        //cliente vendedor
+        if (empty($cliente_vendedor_id)) {
+            if ($tipo == 'V') {
+                $clientes = $this->Negociacao->query('select id, tipopessoa,razaosocial, nome from clientes where id = ' . $cliente_id);
+                foreach ($clientes as $key => $item) :
+                    if ($item[0]['tipopessoa'] == 'J') {
+                        $cliente[$item[0]['id']] = $item[0]['razaosocial'];
+                    } else {
+                        $cliente[$item[0]['id']] = $item[0]['nome'];
+                    }
+                endforeach;
+
+                $this->set('cliente_vendedor', $cliente);
+
+                CakeSession::write('cliente_vendedor_id', $cliente_id);
+            }
+        } else {
+            $clientes = $this->Negociacao->query('select id, tipopessoa, razaosocial, nome from clientes where id = ' . $cliente_vendedor_id);
+
+            foreach ($clientes as $key => $item) :
+                if ($item[0]['tipopessoa'] == 'J') {
+                    $cliente[$item[0]['id']] = $item[0]['razaosocial'];
+                } else {
+                    $cliente[$item[0]['id']] = $item[0]['nome'];
+                }
+            endforeach;
+
+            $this->set('cliente_vendedor', $cliente);
+
+            CakeSession::write('cliente_vendedor_id', $cliente_vendedor_id);
+        }
+
+        //cliente comprador
+        if (empty($cliente_comprador_id)) {
+            if ($tipo == 'C') {
+                $clientes = $this->Negociacao->query('select id, tipopessoa, razaosocial, nome from clientes where id = ' . $cliente_id);
+
+                foreach ($clientes as $key => $item) :
+                    if ($item[0]['tipopessoa'] == 'J') {
+                        $cliente[$item[0]['id']] = $item[0]['razaosocial'];
+                    } else {
+                        $cliente[$item[0]['id']] = $item[0]['nome'];
+                    }
+                endforeach;
+
+                $this->set('cliente_comprador', $cliente);
+
+                CakeSession::write('cliente_comprador_id', $cliente_id);
+            }
+        } else {
+            $clientes = $this->Negociacao->query('select id, tipopessoa, razaosocial, nome from clientes where id = ' . $cliente_comprador_id);
+
+            foreach ($clientes as $key => $item) :
+                if ($item[0]['tipopessoa'] == 'J') {
+                    $cliente[$item[0]['id']] = $item[0]['razaosocial'];
+                } else {
+                    $cliente[$item[0]['id']] = $item[0]['nome'];
+                }
+            endforeach;
+
+            $this->set('cliente_comprador', $cliente);
+
+            CakeSession::write('cliente_comprador_id', $cliente_comprador_id);
+        }
 
         if ($this->request->is('post')) {
 
@@ -204,6 +297,10 @@ class NegociacaosController extends AppController {
                     $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
                 }
             } catch (Exception $id) {
+                debug($this->Negociacao->validationErrors); //show validationErrors
+                debug($this->Negociacao->getDataSource()->getLog(false, false));
+                die();
+
                 $this->Negociacao->rollback();
                 $this->Session->setFlash('Registro não foi salvo. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
@@ -236,8 +333,6 @@ class NegociacaosController extends AppController {
 
         if ($this->request->is('post') || $this->request->is('put')) {
 
-            debug($this->request->data['Negociacao']['valor_imovel']);
-
             $this->request->data['Negociacao']['user_alt_id'] = $dadosUser['Auth']['User']['id'];
             $this->request->data['Negociacao']['modified'] = date('Y-m-d H:i:s');
             $this->request->data['Negociacao']['valor_imovel'] = str_replace(',', '.', str_replace('.', '', $this->request->data['Negociacao']['valor_imovel']));
@@ -247,19 +342,11 @@ class NegociacaosController extends AppController {
             $this->request->data['Negociacao']['honorarios'] = 0;
             $this->request->data['Negociacao']['perc_fechamento'] = 0;
             $this->request->data['Negociacao']['vgv_final'] = 0;
-//            $this->request->data['Negociacao']['dtvenda'] = '';
-
-            debug($this->request->data['Negociacao']['valor_imovel']);
-//            die();
 
             if ($this->Negociacao->save($this->request->data)) {
                 $this->Session->setFlash('Registro alterado com sucesso.', 'default', array('class' => 'mensagem_sucesso'));
                 $this->redirect(array('action' => 'index'));
             } else {
-                debug($this->Negociacao->validationErrors); //show validationErrors
-                debug($this->Negociacao->getDataSource()->getLog(false, false));
-                die();
-
                 $this->Session->setFlash('Registro não foi alterado. Por favor tente novamente.', 'default', array('class' => 'mensagem_erro'));
             }
         } else {

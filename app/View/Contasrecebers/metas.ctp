@@ -2,6 +2,7 @@
 <fieldset>
     <?php
     echo $this->Form->input('ano', array('label' => false, 'type' => 'text', 'label' => 'Ano', 'style' => 'height: 30px;width:60px;margin-top:10px'));
+    echo $this->Form->input('corretor', array('id' => 'corretorID', 'title' => 'CTRL + Click (para selecionar mais de um)', 'label' => 'Corretor', 'type' => 'select', 'multiple' => true));
     echo $this->Form->input('tipo', array('id' => 'tipoID', 'options' => $tipos, 'label' => 'Tipo de gráfico'));
     ?>
 </fieldset>

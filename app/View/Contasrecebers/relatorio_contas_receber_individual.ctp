@@ -19,6 +19,8 @@ $corretors = '';
         <th><?php echo 'Corretor'; ?></th>
         <th><?php echo 'Vendedor'; ?></th>
         <th><?php echo 'Comprador'; ?></th>
+        <th><?php echo 'Ref'; ?></th>
+        <th><?php echo 'Unid'; ?></th>
         <th><?php echo 'Status'; ?></th>
         <th><?php echo 'Nº parcelas'; ?></th>
         <th><?php echo 'Total'; ?></th>
@@ -40,8 +42,32 @@ $corretors = '';
                 $corretors = $this->requestAction('/Contasrecebers/busca_corretors', array('pass' => array($item['Negociacao']['id'])));
                 ?>
                 <td><?php echo $corretors; ?>&nbsp;</td>
-                <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
-                <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
+
+                <?php //Cliente vendedor ?>
+                <?php if (!empty($item['Negociacao']['cliente_vendedor_id'])) { ?>
+                    <?php if ($item['Clientevendedor']['tipopessoa'] == 'F') { ?>
+                        <td><?php echo h($item['Clientevendedor']['nome']); ?>&nbsp;</td>
+                    <?php } elseif ($item['Clientevendedor']['tipopessoa'] == 'J') { ?>
+                        <td><?php echo h($item['Clientevendedor']['razaosocial']); ?>&nbsp;</td>
+                    <?php } ?>
+                <?php } else { ?>
+                    <td><?php echo h($item['Negociacao']['cliente_vendedor']); ?>&nbsp;</td>
+                <?php } ?>
+
+                <?php //Cliente comprador ?>
+                <?php if (!empty($item['Negociacao']['cliente_comprador_id'])) { ?>
+                    <?php if ($item['Clientecomprador']['tipopessoa'] == 'F') { ?>
+                        <td><?php echo h($item['Clientecomprador']['nome']); ?>&nbsp;</td>
+                    <?php } elseif ($item['Clientecomprador']['tipopessoa'] == 'J') { ?>
+                        <td><?php echo h($item['Clientecomprador']['razaosocial']); ?>&nbsp;</td>
+                    <?php } ?>
+                <?php } else { ?>
+                    <td><?php echo h($item['Negociacao']['cliente_comprador']); ?>&nbsp;</td>
+                <?php } ?>
+
+                <td><?php echo h($item['Negociacao']['referencia']); ?>&nbsp;</td>
+                <td><?php echo h($item['Negociacao']['unidade']); ?>&nbsp;</td>
+
                 <?php if ($item['Contasreceber']['status'] == 'A') { ?>
                     <td><strong><font color="blue"><?php echo 'Aberto'; ?>&nbsp;</font></strong></td>
                 <?php } else { ?>
@@ -53,7 +79,7 @@ $corretors = '';
                 <td><?php echo number_format($saldo, 2, ',', '.'); ?>&nbsp;</td>
                 <?php $saldo_final = $saldo_final + $saldo; ?>
             <?php } else { ?>
-                <td colspan="9"><?php echo ''; ?>&nbsp;</td>
+                <td colspan="11"><?php echo ''; ?>&nbsp;</td>
             <?php } ?>
             <?php if (!empty($item['Contasrecebermov']['dtvencimento'])) { ?>
                 <td><?php echo date('d/m/Y', strtotime($item['Contasrecebermov']['dtvencimento'])); ?>&nbsp;</td>

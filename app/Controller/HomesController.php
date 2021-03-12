@@ -16,8 +16,14 @@ class HomesController extends AppController {
 
         $this->loadModel('Contasreceber');
 
-        $contasrecebers = $this->Contasreceber->query('select negociacaos.cliente_comprador, contasrecebers.id, dtvencimento, valorparcela
-                                                         from negociacaos,
+        $contasrecebers = $this->Contasreceber->query('select negociacaos.cliente_comprador,
+                                                              negociacaos.cliente_comprador_id,
+                                                              clientecomprador.nome,
+                                                              clientecomprador.razaosocial,
+                                                              contasrecebers.id,
+                                                              dtvencimento,
+                                                              valorparcela
+                                                         from negociacaos left join clientes as clientecomprador on (negociacaos.cliente_comprador_id = clientecomprador.id),
                                                               contasrecebers,
                                                               contasrecebermovs
                                                         where negociacaos.id    = contasrecebers.negociacao_id

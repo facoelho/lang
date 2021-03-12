@@ -26,7 +26,15 @@
                         <?php } else { ?>
                             <td><strong><font color="green"><?php echo date('d/m/Y', strtotime($item[0]['dtvencimento'])); ?></font></strong></td>
                         <?php } ?>
-                        <td><?php echo $item[0]['cliente_comprador']; ?></td>
+                        <?php if (!empty($item[0]['cliente_comprador_id'])) { ?>
+                            <?php if (!empty($item[0]['nome'])) { ?>
+                                <td><?php echo $item[0]['nome']; ?></td>
+                            <?php } else { ?>
+                                <td><?php echo $item[0]['razaosocial']; ?></td>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <td><?php echo $item[0]['cliente_comprador']; ?></td>
+                        <?php } ?>                            
                         <td><?php echo number_format($item[0]['valorparcela'], 2, ",", "."); ?></td>
                         <td>
                             <div id="botoes">

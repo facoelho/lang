@@ -2,7 +2,7 @@
 
 <?php $column_chart_barras->div('chart_div'); ?>
 
-<div id="chart_div">
+<div id="chart_div" style="position: relative; width: 1141px; height: 800px;">
     <?php $this->GoogleCharts->createJsChart($column_chart_barras); ?>
 </div>
 <center><b><?php echo 'Meta 3º Trimestre'; ?></b></center>
